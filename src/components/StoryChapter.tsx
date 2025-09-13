@@ -28,33 +28,10 @@ export default function StoryChapter({ lines, onComplete }: StoryChapterProps) {
     // 画面全体を覆う黒い背景（クリック可能）
     <div
       onClick={handleNextLine}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        background: 'rgba(0, 0, 0, 0.8)',
-        color: 'white',
-        display: 'flex',
-        alignItems: 'flex-end', // テキストボックスを画面下に配置
-        padding: '2rem',
-        cursor: 'pointer',
-      }}
     >
-      {/* テキストボックス */}
-      <div
-        style={{
-          width: '100%',
-          border: '2px solid cyan',
-          borderRadius: '8px',
-          padding: '1.5rem',
-          fontSize: '1.5rem',
-        }}
-      >
-        {/* 現在の行のセリフを表示 */}
+      <div>
         <p>{lines[currentLineIndex]}</p>
-        <div style={{ textAlign: 'right', marginTop: '1rem' }}>▼</div>
+        <div>▼</div>
       </div>
     </div>
   );
