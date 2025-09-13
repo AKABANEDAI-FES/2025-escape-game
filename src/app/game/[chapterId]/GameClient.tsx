@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { gameData } from '@/lib/gameData';
 import StoryChapter from '@/components/StoryChapter';
+import PuzzleDisplay from '@/components/game/PuzzleDisplay';
+import SuccessScreen from '@/components/game/SuccessScreen';
 
 // chapterIdをpropsとして受け取る
 export default function GameClient({ chapterId }: { chapterId: string }) {
@@ -34,16 +36,15 @@ export default function GameClient({ chapterId }: { chapterId: string }) {
   };
 
   return (
-    <main style={{ background: 'black', width: '100vw', height: '100vh' }}>
+    <main>
       {chapter.type === 'story' && (
         <StoryChapter lines={chapter.content} onComplete={goToNextChapter} />
       )}
       {chapter.type === 'puzzle' && (
-        <div style={{ color: 'white', padding: '2rem' }}>
-          <h2>{chapter.question}</h2>
-          <p>（ここは後で謎解き画面になります）</p>
-          <button onClick={goToNextChapter}>仮の「次に進む」ボタン</button>
-        </div>
+        <PuzzleDisplay puzzle={chapter} onSolved={goToNextChapter} />
+      )}
+      {chapter.type === 'ending' && (
+        <SuccessScreen title={chapter.title} message={chapter.message} />
       )}
     </main>
   );

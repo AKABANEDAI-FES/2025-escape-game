@@ -19,8 +19,13 @@ export interface ActionChapter {
     message: string; // アクションの説明
     nextChapterId: string; // 次の章のID
 }
+export interface EndingChapter {
+  type: 'ending';
+  title: string;
+  message: string;
+}
 
-export type GameChapter = StoryChapter | PuzzleChapter | ActionChapter;
+export type GameChapter = StoryChapter | PuzzleChapter | ActionChapter | EndingChapter;
 
 export const gameData:Record<string, GameChapter> ={
     'start': {
@@ -35,24 +40,24 @@ export const gameData:Record<string, GameChapter> ={
   'puzzle-1': {
     type: 'puzzle',
     puzzleType: 'QR_SCAN',
-    question: "最初の謎だ。部屋の中にあるQRコードを探し、スキャンせよ。",
-    answer: "QR_CODE_DATA_1", // QRコードに埋め込むデータ
+    question: "最初の謎だ。test",
+    answer: "test", // QRコードに埋め込むデータ
     nextChapterId: 'puzzle-2',
     hint:"ヒント: 部屋の中央をよく見てみろ。",
   },
   'puzzle-2': {
     type: 'puzzle',
     puzzleType: 'QR_SCAN',
-    question: "順調だ。次のQRコードを探せ。",
-    answer: "QR_CODE_DATA_2",
+    question: "順調だ。",
+    answer: "test",
     hint: "ヒント: 部屋の隅に注意してみろ。",
     nextChapterId: 'puzzle-3',
   },
   'puzzle-3': {
     type: 'puzzle',
     puzzleType: 'QR_SCAN',
-    question: "最後のQRコードだ。これで道が開かれるだろう。",
-    answer: "QR_CODE_DATA_3",
+    question: "最後だ",
+    answer: "test",
     hint: "ヒント: 高い場所を探せ。",
     nextChapterId: 'door-open-story',
   },
@@ -80,7 +85,7 @@ export const gameData:Record<string, GameChapter> ={
     type: 'puzzle',
     puzzleType: 'TEXT_INPUT',
     question: "中央のコンソールに表示された謎を解け。",
-    answer: "HIMITSU",
+    answer: "test",
     nextChapterId: 'projector-start-story',
     hint: "ヒント: 部屋の壁に注目してみろ。",
   },
@@ -100,7 +105,7 @@ export const gameData:Record<string, GameChapter> ={
     type: 'puzzle',
     puzzleType: 'TEXT_INPUT',
     question: "壁に投影された最後の謎だ。脱出のキーワードを入力せよ。",
-    answer: "SAIGO",
+    answer: "test",
     nextChapterId: 'action-final-projector',
     hint: "ヒント: 部屋の中央に注目してみろ。",
   },
@@ -123,14 +128,16 @@ export const gameData:Record<string, GameChapter> ={
   /**
    * ゲームオーバー / クリア画面
    */
-  'success': {
+  'final-story': {
     type: 'story',
-    content: ["脱出成功！"],
-    nextChapterId: 'start', // スタート画面に戻るなど
+    content: ["AI: よくやった。これで全ての謎を解き明かした。"],
+    nextChapterId: 'success', // ★ 次のチャプターを'success'に設定
   },
-  'failure': {
-    type: 'story',
-    content: ["脱出失敗..."],
-    nextChapterId: 'end', // スタらなかった
+  
+  // ★ 'success'チャプターを新しい'ending'タイプに変更
+  'success': {
+    type: 'ending',
+    title: '脱出成功！',
+    message: '全ての謎を解き、施設から脱出することができた。',
   },
 };
