@@ -131,6 +131,6 @@ export const gameData:Record<string, GameChapter> ={
   'failure': {
     type: 'story',
     content: ["脱出失敗..."],
-    nextChapterId: 'start', // スタらなかった
+    nextChapterId: 'end', // スタらなかった
   },
 };
