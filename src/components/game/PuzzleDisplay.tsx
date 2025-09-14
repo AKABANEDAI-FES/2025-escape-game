@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { PuzzleChapter } from '@/lib/gameData'; // gameData.tsから型をインポート
+import { useRouter } from 'next/navigation';
 
 // この部品が受け取る情報
 interface PuzzleDisplayProps {
@@ -29,6 +30,8 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
     }
   };
 
+  const router = useRouter();
+
   return (
     <div className="puzzle-container">
       <h2 className="puzzle-question">{puzzle.question}</h2>
@@ -46,6 +49,13 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
 
       {/* エラーメッセージがあれば表示する */}
       {errorMessage && <p>{errorMessage}</p>}
+
+      <br></br>
+      
+      {/* QRコード読み取り画面へ遷移するボタン */}
+      <button onClick={() => router.push('/qr-reader')}>
+        QRコードを読み込む
+      </button>
     </div>
   );
 }
