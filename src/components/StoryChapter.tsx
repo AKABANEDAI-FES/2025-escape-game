@@ -27,6 +27,7 @@ export default function StoryChapter({ lines, onComplete }: StoryChapterProps) {
   return (
     // 画面全体を覆う黒い背景（クリック可能）
     <div
+      className='absolute bottom-16 h-1/4 w-4/5 left-1/10 border rounded-3xl border-black flex justify-center items-center text-center text-xl'
       onClick={handleNextLine}
     >
       <div>
