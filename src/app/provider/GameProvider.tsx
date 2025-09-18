@@ -1,7 +1,7 @@
-// app/provider/GameProvider.tsx
 'use client';
-import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { usePersistentGameState } from '@/hooks/usePersistentGameState';
+import { useGameTimer } from '@/hooks/useGameTimer';
 
 interface GameContextType {
   remainingTime: number;
@@ -15,55 +15,40 @@ interface GameContextType {
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
+  // 仕事1：状態管理は専門家（usePersistentGameState）に任せる
   const { gameState, setGameState, isLoaded, resetGameState } = usePersistentGameState();
-  const [isTimerRunning, setIsTimerRunning] = useState(true); // 初期値trueで自動スタート
+  
+  // 仕事2：タイマー処理も専門家（useGameTimer）に任せる
+  const { isTimerRunning, pauseTimer, resumeTimer } = useGameTimer({
+    ...gameState,
+    isLoaded,
+    setGameState,
+  });
 
-  // タイマー処理
-  useEffect(() => {
-    console.log('GameProvider useEffect run', isLoaded, isTimerRunning);
-
-    if (!isLoaded || !isTimerRunning) return;
-
-    const timer = setInterval(() => {
-      setGameState(prev => {
-        const newTime = Math.max(prev.remainingTimer - 1, 0);
-        console.log('GameProvider updating remainingTime:', newTime);
-        return { ...prev, remainingTimer: newTime };
-      });
-
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [isLoaded, isTimerRunning, setGameState]);
-
-  const pauseTimer = () => setIsTimerRunning(false);
-  const resumeTimer = () => setIsTimerRunning(true);
+  // ゲームリセットの命令を出す
   const resetGame = () => {
     resetGameState();
-    setIsTimerRunning(true);
+    resumeTimer(); // タイマーも開始させる
   };
 
   if (!isLoaded) return null;
 
+  // 組み立てた結果を全体に提供する
   return (
-    <GameContext.Provider
-      value={{
-        remainingTime: gameState.remainingTimer,
-        currentChapterId: gameState.currentChapterId,
-        isTimerRunning,
-        pauseTimer,
-        resumeTimer,
-        resetGame,
-      }}
-    >
+    <GameContext.Provider value={{
+      ...gameState,
+      isTimerRunning,
+      pauseTimer,
+      resumeTimer,
+      resetGame,
+    }}>
       {children}
     </GameContext.Provider>
   );
 };
 
-// カスタムフック
 export const useGame = () => {
   const context = useContext(GameContext);
-  if (!context) throw new Error('useGame must be used within a GameProvider');
+  if (context === undefined) throw new Error('useGame must be used within a GameProvider');
   return context;
 };

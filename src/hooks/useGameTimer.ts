@@ -1,46 +1,41 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { GameState } from './usePersistentGameState'; 
+import { GameState } from './usePersistentGameState';
 
-// このフックが受け取る引数の型
 interface UseGameTimerProps {
   remainingTime: number;
   currentChapterId: string;
   isLoaded: boolean;
-  // ★ anyをGameStateに変更
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
-// タイマーロジックを担当するカスタムフック
 export function useGameTimer({ remainingTime, currentChapterId, isLoaded, setGameState }: UseGameTimerProps) {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const router = useRouter();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // タイマーを動かす処理
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || !isTimerRunning) return;
 
-    if (intervalRef.current) clearInterval(intervalRef.current);
-
-    if (isTimerRunning && remainingTime > 0) {
-      intervalRef.current = setInterval(() => {
-        // このprevがGameState型であるとTypeScriptが認識できるようになります
-        setGameState((prev: GameState) => ({ ...prev, remainingTimer: prev.remainingTimer - 1 }));
-      }, 1000);
-    }
-
-    if (remainingTime <= 0) {
-      if (currentChapterId !== 'failure') {
-        setGameState((prev: GameState) => ({ ...prev, currentChapterId: 'failure', remainingTime: 0 }));
-        router.push('/game/failure');
-      }
-    }
+    intervalRef.current = setInterval(() => {
+      setGameState(prev => prev.remainingTime > 0 ? { ...prev, remainingTime: prev.remainingTime - 1 } : prev);
+    }, 1000);
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isTimerRunning, remainingTime, currentChapterId, router, isLoaded, setGameState]);
+  }, [isTimerRunning, isLoaded, setGameState]);
+
+  // 時間切れを監視する処理
+  useEffect(() => {
+    if (isLoaded && remainingTime <= 0) {
+      if (currentChapterId !== 'failure') {
+        router.push('/game/failure');
+      }
+    }
+  }, [remainingTime, isLoaded, currentChapterId, router]);
 
   const pauseTimer = () => setIsTimerRunning(false);
   const resumeTimer = () => setIsTimerRunning(true);
