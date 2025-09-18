@@ -1,11 +1,14 @@
+'use client'
 import Link from "next/link";
+import { useGame } from "./provider/GameProvider";
 
 export default function Home() {
-  return (
+  const {resetGame}=useGame();
+    return (
     <main>
       <h1>2025 脱出ゲーム</h1>
       <Link href="/game/start">
-        <button style={{ fontSize: "1.5rem", padding: "1rem" }}>
+        <button onClick={resetGame}>
           ゲーム開始
         </button>
       </Link>
