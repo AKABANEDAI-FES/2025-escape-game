@@ -1,15 +1,14 @@
 // app/components/Timer.tsx
 'use client';
-import { useGame } from "@/app/provider/GameProvider";
-
-export default function Timer() {
-  const { remainingTime } = useGame();
+interface TimerProps {
+  remainingTime: number;
+}
+export default function Timer({remainingTime}: TimerProps) {
 
   // レンダリングごとにログ
-  console.log('Timer render:', remainingTime);
 
-  const formatTime = (time: number) => {
-    const t = Math.max(0, time);
+  const formatTime = (remainingTime: number) => {
+    const t = Math.max(0, remainingTime);
     const minutes = Math.floor(t / 60).toString().padStart(2, '0');
     const seconds = (t % 60).toString().padStart(2, '0');
     return `${minutes}:${seconds}`;
