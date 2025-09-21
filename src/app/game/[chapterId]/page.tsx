@@ -8,6 +8,12 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function GamePage({ params }: { params: { chapterId: string } }) {
-  return <GameClient chapterId={params.chapterId} />;
+// GamePage を async にして params を await
+export default async function GamePage({
+  params,
+}: {
+  params: Promise<{ chapterId: string }>;
+}) {
+  const { chapterId } = await params;
+  return <GameClient chapterId={chapterId} />;
 }

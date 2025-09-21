@@ -1,7 +1,10 @@
+'use client'
 import Link from "next/link";
+import { useGame } from "./provider/GameProvider";
 
 export default function Home() {
-  return (
+  const {resetGame}=useGame();
+    return (
     <main>
       <h1>2025 脱出ゲーム</h1>
       <div className="flex text-center justify-center">

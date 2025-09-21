@@ -140,4 +140,9 @@ export const gameData:Record<string, GameChapter> ={
     title: '脱出成功！',
     message: '全ての謎を解き、施設から脱出することができた。',
   },
+  'failure': {
+    type: 'ending',
+    title: '脱出失敗...',
+    message: '時間切れです。もう一度挑戦してください。',
+  },
 };

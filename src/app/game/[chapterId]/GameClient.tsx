@@ -5,6 +5,7 @@ import { gameData } from '@/lib/gameData';
 import StoryChapter from '@/components/StoryChapter';
 import PuzzleDisplay from '@/components/game/PuzzleDisplay';
 import SuccessScreen from '@/components/game/SuccessScreen';
+import GameOverScreen from '@/components/game/GameOverScreen';
 
 // chapterIdをpropsとして受け取る
 export default function GameClient({ chapterId }: { chapterId: string }) {
@@ -43,8 +44,11 @@ export default function GameClient({ chapterId }: { chapterId: string }) {
       {chapter.type === 'puzzle' && (
         <PuzzleDisplay puzzle={chapter} onSolved={goToNextChapter} />
       )}
-      {chapter.type === 'ending' && (
+      {chapter.type === 'ending' && chapterId === 'success' && (
         <SuccessScreen title={chapter.title} message={chapter.message} />
+      )}
+      {chapter.type === 'ending' && chapterId === 'failure' && (
+        <GameOverScreen title={chapter.title} message={chapter.message} />
       )}
     </main>
   );

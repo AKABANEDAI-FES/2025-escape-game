@@ -1,7 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PuzzleChapter } from '@/lib/gameData'; // gameData.tsから型をインポート
+import { useGame } from '@/app/provider/GameProvider';
+import { useGameTimer } from '@/hooks/useGameTimer';
+import Timer from './Timer';
 
 // この部品が受け取る情報
 interface PuzzleDisplayProps {
@@ -10,6 +13,18 @@ interface PuzzleDisplayProps {
 }
 
 export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) {
+  const { remainingTime, currentChapterId, setGameState } = useGame();
+  const {resumeTimer, pauseTimer}=useGameTimer({
+    remainingTime,
+    currentChapterId,
+    isLoaded: true,
+    setGameState
+  });
+
+  useEffect(()=>{
+    resumeTimer();
+    return ()=>{pauseTimer();}
+  },[resumeTimer,pauseTimer])
   // プレイヤーの入力内容を覚えておくための変数
   const [playerInput, setPlayerInput] = useState('');
   // 不正解だったときのエラーメッセージを覚えておく変数
@@ -18,7 +33,6 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
   // 提出ボタンが押されたときの処理
   const handleSubmit = () => {
     // 入力された答えと、正解の答えを比較
-    // toUpperCase()で両方大文字に変換し、大文字・小文字を区別しないようにする
     if (playerInput.toUpperCase() === puzzle.answer.toUpperCase()) {
       // 正解の場合
       setErrorMessage(''); // エラーメッセージを消す
@@ -31,6 +45,7 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
 
   return (
     <div className="puzzle-container">
+      <Timer remainingTime={remainingTime} />
       <h2 className="puzzle-question">{puzzle.question}</h2>
 
       <input
