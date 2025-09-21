@@ -10,7 +10,7 @@ export default function Home() {
       <div className="flex text-center justify-center">
         <div className="">
           <div className="m-24 w-80">
-            <Link href="/game/start">
+            <Link href="/game/start" onClick={resetGame}>
               <button className="text-5xl p-12 border border-blue-700 border-solid rounded leading-8">
                 スタート
               </button>

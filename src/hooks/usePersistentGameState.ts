@@ -11,7 +11,7 @@ export interface GameState {
 
 const initialGameState: GameState = {
     currentChapterId: 'start',
-    remainingTime: 60 * 0.2, // 60分
+    remainingTime: 60 * 1, // 60分
 }
 
 export function usePersistentGameState() {

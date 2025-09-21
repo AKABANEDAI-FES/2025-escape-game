@@ -39,6 +39,9 @@ export function useGameTimer({ remainingTime, currentChapterId, isLoaded, setGam
 
   const pauseTimer = () => setIsTimerRunning(false);
   const resumeTimer = () => setIsTimerRunning(true);
-
-  return { isTimerRunning, pauseTimer, resumeTimer };
+  const resetTimer =(newTime:number)=>{
+    setGameState(prev=>({...prev,remainingTime:newTime}));
+  }
+  
+  return { isTimerRunning, pauseTimer, resumeTimer, resetTimer };
 }

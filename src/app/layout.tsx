@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { GameProvider } from "./provider/GameProvider";
+import ClientRoot from "./ClientRoot";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,7 @@ export default function RootLayout({
     // htmlの言語設定を日本語に
     <html lang="ja">
       <body className={inter.className}>
-        <GameProvider>{children}</GameProvider>
+        <ClientRoot>{children}</ClientRoot>
       </body>
     </html>
   );

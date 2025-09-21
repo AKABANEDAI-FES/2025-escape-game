@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, ReactNode, Dispatch, SetStateAction } from "react";
 import { GameState, usePersistentGameState } from "@/hooks/usePersistentGameState";
+import { useGameTimer } from "@/hooks/useGameTimer";
 
 interface GameContextType {
   remainingTime: number;
@@ -9,6 +10,7 @@ interface GameContextType {
   pauseTimer: () => void;
   resumeTimer: () => void;
   resetGame: () => void;
+  resetTimer: (newTime: number) => void;
   setGameState: Dispatch<SetStateAction<GameState>>;
 }
 
@@ -16,14 +18,12 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
   // 仕事1：状態管理は専門家（usePersistentGameState）に任せる
-  const { gameState, setGameState, isLoaded, resetGameState } =
-    usePersistentGameState();
-
-  // 仕事2：タイマー処理も専門家（useGameTimer）に任せる
-  const isTimerRunning = false; // 初期値だけ
-  const pauseTimer = () => {};
-  const resumeTimer = () => {};
-
+  const { gameState, setGameState, isLoaded, resetGameState } = usePersistentGameState();
+  const { isTimerRunning, pauseTimer, resumeTimer, resetTimer } = useGameTimer({
+    ...gameState,
+    isLoaded,
+    setGameState,
+  });
   // ゲームリセットの命令を出す
   const resetGame = () => {
     resetGameState();
@@ -40,6 +40,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         isTimerRunning,
         pauseTimer,
         resumeTimer,
+        resetTimer,
         resetGame,
         setGameState,
       }}
