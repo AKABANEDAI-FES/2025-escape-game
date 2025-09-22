@@ -1,7 +1,7 @@
-'use client';
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { GameState } from './usePersistentGameState';
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { GameState } from "./usePersistentGameState";
 
 interface UseGameTimerProps {
   remainingTime: number;
@@ -10,7 +10,12 @@ interface UseGameTimerProps {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
-export function useGameTimer({ remainingTime, currentChapterId, isLoaded, setGameState }: UseGameTimerProps) {
+export function useGameTimer({
+  remainingTime,
+  currentChapterId,
+  isLoaded,
+  setGameState,
+}: UseGameTimerProps) {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const router = useRouter();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -18,9 +23,16 @@ export function useGameTimer({ remainingTime, currentChapterId, isLoaded, setGam
   // タイマーを動かす処理
   useEffect(() => {
     if (!isLoaded || !isTimerRunning) return;
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
 
     intervalRef.current = setInterval(() => {
-      setGameState(prev => prev.remainingTime > 0 ? { ...prev, remainingTime: prev.remainingTime - 1 } : prev);
+      setGameState((prev) =>
+        prev.remainingTime > 0
+          ? { ...prev, remainingTime: prev.remainingTime - 1 }
+          : prev
+      );
     }, 1000);
 
     return () => {
@@ -31,14 +43,23 @@ export function useGameTimer({ remainingTime, currentChapterId, isLoaded, setGam
   // 時間切れを監視する処理
   useEffect(() => {
     if (isLoaded && remainingTime <= 0) {
-      if (currentChapterId !== 'failure') {
-        router.push('/game/failure');
+      if (currentChapterId !== "failure") {
+        router.push("/game/failure");
       }
     }
   }, [remainingTime, isLoaded, currentChapterId, router]);
 
-  const pauseTimer = () => setIsTimerRunning(false);
+  const pauseTimer = () => {
+    setIsTimerRunning(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
   const resumeTimer = () => setIsTimerRunning(true);
+  const resetTimer = (newTime: number) => {
+    setGameState((prev) => ({ ...prev, remainingTime: newTime }));
+  };
 
-  return { isTimerRunning, pauseTimer, resumeTimer };
+  return { isTimerRunning, pauseTimer, resumeTimer, resetTimer };
 }

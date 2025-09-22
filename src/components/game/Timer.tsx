@@ -1,11 +1,11 @@
 // app/components/Timer.tsx
 'use client';
-interface TimerProps {
-  remainingTime: number;
-}
-export default function Timer({remainingTime}: TimerProps) {
 
-  // レンダリングごとにログ
+import { useGame } from "@/app/provider/GameProvider";
+
+export default function Timer() {
+
+  const { remainingTime } = useGame();
 
   const formatTime = (remainingTime: number) => {
     const t = Math.max(0, remainingTime);
@@ -17,8 +17,8 @@ export default function Timer({remainingTime}: TimerProps) {
   const isWarning = remainingTime <= 10;
 
   return (
-    <div className={`timer ${isWarning ? 'warning' : ''}`}>
+    <span className={`timer ${isWarning ? 'warning' : ''}`}>
       {formatTime(remainingTime)}
-    </div>
+    </span>
   );
 }

@@ -25,27 +25,21 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
     resumeTimer();
     return ()=>{pauseTimer();}
   },[resumeTimer,pauseTimer])
-  // プレイヤーの入力内容を覚えておくための変数
   const [playerInput, setPlayerInput] = useState('');
-  // 不正解だったときのエラーメッセージを覚えておく変数
   const [errorMessage, setErrorMessage] = useState('');
 
-  // 提出ボタンが押されたときの処理
   const handleSubmit = () => {
-    // 入力された答えと、正解の答えを比較
     if (playerInput.toUpperCase() === puzzle.answer.toUpperCase()) {
-      // 正解の場合
       setErrorMessage(''); // エラーメッセージを消す
       onSolved(); // 次のチャプターへ進む
     } else {
-      // 不正解の場合
       setErrorMessage('答えが違うみたい'); // 要件定義書のエラーメッセージ
     }
   };
 
   return (
     <div className="puzzle-container">
-      <Timer remainingTime={remainingTime} />
+      <Timer />
       <h2 className="puzzle-question">{puzzle.question}</h2>
 
       <input

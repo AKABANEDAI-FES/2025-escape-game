@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useGame } from '@/app/provider/GameProvider';
+import { useEffect, useState } from 'react';
 
 // この部品が受け取る情報（props）の型を定義
 interface StoryChapterProps {
@@ -11,6 +12,7 @@ interface StoryChapterProps {
 export default function StoryChapter({ lines, onComplete }: StoryChapterProps) {
   // 今、何行目のセリフを表示しているかを覚えておくための変数
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const {pauseTimer,resumeTimer}=useGame();
 
   // 画面がクリックされたときの処理
   const handleNextLine = () => {
@@ -23,7 +25,10 @@ export default function StoryChapter({ lines, onComplete }: StoryChapterProps) {
       onComplete();
     }
   };
-
+  useEffect(()=>{
+    pauseTimer();
+    return ()=>{resumeTimer()};
+  },[])
   return (
     // 画面全体を覆う黒い背景（クリック可能）
     <div
