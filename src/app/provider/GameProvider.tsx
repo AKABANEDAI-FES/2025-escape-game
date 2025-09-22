@@ -12,18 +12,21 @@ interface GameContextType {
   resetGame: () => void;
   resetTimer: (newTime: number) => void;
   setGameState: Dispatch<SetStateAction<GameState>>;
+  setCurrentChapterId: (id: string) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
-  // 仕事1：状態管理は専門家（usePersistentGameState）に任せる
   const { gameState, setGameState, isLoaded, resetGameState } = usePersistentGameState();
   const { isTimerRunning, pauseTimer, resumeTimer, resetTimer } = useGameTimer({
     ...gameState,
     isLoaded,
     setGameState,
   });
+  const setCurrentChapterId = (id: string) => {
+    setGameState((prev) => ({ ...prev, currentChapterId: id }));
+  };
   // ゲームリセットの命令を出す
   const resetGame = () => {
     resetGameState();
@@ -43,6 +46,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         resetTimer,
         resetGame,
         setGameState,
+        setCurrentChapterId,
       }}
     >
       {children}

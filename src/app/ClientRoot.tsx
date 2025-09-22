@@ -48,7 +48,6 @@ export default function ClientRoot({ children }: { children: React.ReactNode }) 
       router.push('/Admin'); // 管理者ページへ移動
     }
   };
-  // ★ ----- ここまでが追加ロジック ----- ★
 
   return (
     <GameProvider>
