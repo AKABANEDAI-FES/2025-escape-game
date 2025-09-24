@@ -1,6 +1,7 @@
-"use client";
+'use client';
 import React, { createContext, useContext, ReactNode, Dispatch, SetStateAction } from "react";
-import { GameState, usePersistentGameState } from "@/hooks/usePersistentGameState";
+// ★ Solvedpuzzle -> SolvedPuzzle に修正（TypeScriptの型は大文字で始めるのが一般的です）
+import { GameState, usePersistentGameState, SolvedPuzzle } from "@/hooks/usePersistentGameState"; 
 import { useGameTimer } from "@/hooks/useGameTimer";
 
 interface GameContextType {
@@ -9,10 +10,11 @@ interface GameContextType {
   isTimerRunning: boolean;
   pauseTimer: () => void;
   resumeTimer: () => void;
-  resetGame: () => void;
   resetTimer: (newTime: number) => void;
+  resetGame: () => void;
   setGameState: Dispatch<SetStateAction<GameState>>;
   setCurrentChapterId: (id: string) => void;
+  solvedPuzzles: SolvedPuzzle[];
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -24,20 +26,22 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     isLoaded,
     setGameState,
   });
+
+  // ★ setCurrentChapterId の定義を value の外に移動
   const setCurrentChapterId = (id: string) => {
     setGameState((prev) => ({ ...prev, currentChapterId: id }));
   };
-  // ゲームリセットの命令を出す
+
   const resetGame = () => {
     resetGameState();
-    resumeTimer(); // タイマーも開始させる
+    resumeTimer();
   };
 
   if (!isLoaded) return null;
 
-  // 組み立てた結果を全体に提供する
   return (
     <GameContext.Provider
+      // ★ value の中がスッキリし、何を提供しているかが分かりやすくなる
       value={{
         ...gameState,
         isTimerRunning,
@@ -46,7 +50,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         resetTimer,
         resetGame,
         setGameState,
-        setCurrentChapterId,
+        setCurrentChapterId, // ← 定義した関数を渡す
       }}
     >
       {children}
