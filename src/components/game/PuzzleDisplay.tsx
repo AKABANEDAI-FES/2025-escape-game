@@ -39,20 +39,14 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
 
   return (
     <div className="puzzle-container">
-      <Timer />
-      <h2 className="puzzle-question">{puzzle.question}</h2>
+      <div className='absolute h-1/15 top-1/30 w-1/10 right-1/30 border rounded-xl border-black flex justify-center items-center text-center'>
+        <Timer/>
+      </div>
+      
+      <h2 className="puzzle-question absolute top-32 h-1/3 w-28/30 left-1/30 border rounded-3xl border-black flex justify-center items-center text-center text-xl">
+        {puzzle.question}</h2>
 
-      <input
-        type="text"
-        value={playerInput}
-        onChange={(e) => setPlayerInput(e.target.value)}
-        placeholder="答えを入力"
-      />
-
-      <button onClick={handleSubmit}>
-        解答する
-      </button>
-      <button onClick={() => router.push('/qr-reader')}>
+      <button onClick={() => router.push('/qr-reader')} className='absolute h-1/15 top-2/3 w-1/5 left-2/5 border border-black flex justify-center items-center text-center'>
         QRコードを読み込む
       </button>
 
