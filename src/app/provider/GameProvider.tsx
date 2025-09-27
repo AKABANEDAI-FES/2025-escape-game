@@ -1,46 +1,83 @@
-"use client";
-import React, { createContext, useContext, ReactNode, Dispatch, SetStateAction } from "react";
-import { GameState, usePersistentGameState } from "@/hooks/usePersistentGameState";
-import { useGameTimer } from "@/hooks/useGameTimer";
+'use client';
+import React, { createContext, useContext, ReactNode, Dispatch, SetStateAction, useState, useRef, useCallback, useEffect, use } from "react";
+// ★ Solvedpuzzle -> SolvedPuzzle に修正（TypeScriptの型は大文字で始めるのが一般的です）
+import { GameState, usePersistentGameState, SolvedPuzzle } from "@/hooks/usePersistentGameState"; 
+import { useRouter } from "next/navigation";
 
 interface GameContextType {
   remainingTime: number;
   currentChapterId: string;
-  isTimerRunning: boolean;
+  isTimerPaused: boolean;
   pauseTimer: () => void;
   resumeTimer: () => void;
-  resetGame: () => void;
   resetTimer: (newTime: number) => void;
+  resetGame: () => void;
   setGameState: Dispatch<SetStateAction<GameState>>;
   setCurrentChapterId: (id: string) => void;
+  solvedPuzzles: SolvedPuzzle[];
+  viewedStoryChapters: string[];
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
-  const { gameState, setGameState, isLoaded, resetGameState } = usePersistentGameState();
-  const { isTimerRunning, pauseTimer, resumeTimer, resetTimer } = useGameTimer({
-    ...gameState,
-    isLoaded,
-    setGameState,
-  });
+  const {gameState,setGameState,isLoaded, resetGameState} = usePersistentGameState()
+  const router = useRouter();
+  const timerRef =useRef<ReturnType<typeof setInterval> | null >(null);
+
+  const runTimer=useCallback(()=>{
+    setGameState(prev=>{
+      if(prev.remainingTime <= 0){
+        clearInterval(timerRef.current!);
+        return {...prev, remainingTime:0};
+      }
+      return {...prev, remainingTime:prev.remainingTime -1};
+    })
+  },[setGameState])
+
+  const resumeTimer = useCallback(()=>{
+    setGameState(prev=>({...prev, isTimerPaused:false}));
+  },[setGameState])
+
+  const pauseTimer = useCallback(()=>{
+    setGameState(prev=>({...prev, isTimerPaused:true}));
+  },[setGameState])
+
+  const resetTimer = (newTime: number)=> {
+    setGameState((prev)=>({...prev, remainingTime:newTime}));
+  }
+
+  useEffect(()=>{
+    if(isLoaded && !gameState.isTimerPaused){
+      timerRef.current = setInterval(runTimer, 1000);
+    }else{
+      clearInterval(timerRef.current!);
+    }
+    return ()=>clearInterval(timerRef.current!);
+  }, [ gameState.isTimerPaused,isLoaded, runTimer]);
+
+  useEffect(()=>{
+    if(isLoaded && gameState.remainingTime <=0){
+      if (gameState.currentChapterId !== "failure") {
+        router.push("/game/failure");
+      }
+    }
+  }, [gameState.remainingTime, isLoaded, router, gameState.currentChapterId]);
+
   const setCurrentChapterId = (id: string) => {
     setGameState((prev) => ({ ...prev, currentChapterId: id }));
   };
-  // ゲームリセットの命令を出す
+
   const resetGame = () => {
     resetGameState();
-    resumeTimer(); // タイマーも開始させる
   };
 
   if (!isLoaded) return null;
 
-  // 組み立てた結果を全体に提供する
   return (
     <GameContext.Provider
       value={{
         ...gameState,
-        isTimerRunning,
         pauseTimer,
         resumeTimer,
         resetTimer,
