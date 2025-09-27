@@ -9,26 +9,21 @@ export default function ClientRoot({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const showTimer = pathname.startsWith('/game');
   
-  // ★ ----- ここから管理者ページへの遷移ロジック ----- ★
   const [tapCount, setTapCount] = useState(0);
   const router = useRouter();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // タップ回数をリセットするためのタイマー処理
   useEffect(() => {
-    // 既にタイマーがセットされていれば、それをクリア
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
-    // タップ回数が1以上の場合、2秒後にリセットするタイマーをセット
     if (tapCount > 0) {
       timeoutRef.current = setTimeout(() => {
         setTapCount(0);
       }, 2000); // 2秒間操作がなければリセット
     }
 
-    // コンポーネントが消えるときにもタイマーをクリア
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -36,12 +31,10 @@ export default function ClientRoot({ children }: { children: React.ReactNode }) 
     };
   }, [tapCount]); // tapCountが変わるたびにこの処理を実行
 
-  // 目に見えない領域がタップされたときの処理
   const handleSecretTap = () => {
     const newCount = tapCount + 1;
     setTapCount(newCount);
 
-    // タップ回数が10回に達したら
     if (newCount >= 10) {
       setTapCount(0); // カウントをリセット
       if (timeoutRef.current) clearTimeout(timeoutRef.current); // リセットタイマーもクリア
@@ -51,7 +44,6 @@ export default function ClientRoot({ children }: { children: React.ReactNode }) 
 
   return (
     <GameProvider>
-      {/* ★ 目に見えないタップ領域を画面右上に配置 ★ */}
       <div
         onClick={handleSecretTap}
         style={{

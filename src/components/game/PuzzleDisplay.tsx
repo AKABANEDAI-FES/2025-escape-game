@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { PuzzleChapter } from "@/lib/gameData"; // gameData.tsから型をインポート
 import { useGame } from "@/app/provider/GameProvider";
-import { useGameTimer } from "@/hooks/useGameTimer";
 import Timer from "./Timer";
 
 // この部品が受け取る情報
@@ -16,20 +15,15 @@ export default function PuzzleDisplay({
   puzzle,
   onSolved,
 }: PuzzleDisplayProps) {
-  const { remainingTime, currentChapterId, setGameState } = useGame();
-  const { resumeTimer, pauseTimer } = useGameTimer({
-    remainingTime,
-    currentChapterId,
-    isLoaded: true,
-    setGameState,
-  });
+  const { pauseTimer, resumeTimer, setGameState } = useGame();
 
   useEffect(() => {
     resumeTimer();
     return () => {
       pauseTimer();
     };
-  }, [resumeTimer, pauseTimer]);
+  }, [pauseTimer, resumeTimer]);
+
   const [playerInput, setPlayerInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 

@@ -3,11 +3,12 @@ import { useState, useEffect } from "react";
 
 const GAME_STATE_KEY = "escapeGameProgress";
 
-// ★ interfaceをexportして他のファイルから使えるようにする
 export interface GameState {
   currentChapterId: string;
-  remainingTime: number; // ★ remainingTimerから変更
+  remainingTime: number;
   solvedPuzzles: SolvedPuzzle[];
+  viewedStoryChapters: string[];
+  isTimerPaused:boolean;
 }
 export interface SolvedPuzzle {
   id: string;
@@ -17,8 +18,10 @@ export interface SolvedPuzzle {
 
 const initialGameState: GameState = {
   currentChapterId: "start",
-  remainingTime: 60 * 1, // 60分
+  remainingTime: 60 * 1, 
   solvedPuzzles: [],
+  viewedStoryChapters: [],
+  isTimerPaused: false,
 };
 
 export function usePersistentGameState() {
