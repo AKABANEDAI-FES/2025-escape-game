@@ -8,7 +8,6 @@ import { useGame } from "../provider/GameProvider";
 
 export default function Admin() {
   const {
-    resetGame,
     resetTimer,
     pauseTimer,
     resumeTimer,

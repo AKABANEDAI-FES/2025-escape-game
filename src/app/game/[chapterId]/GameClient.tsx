@@ -45,7 +45,7 @@ export default function GameClient({ chapterId }: { chapterId: string }) {
   return (
     <main>
       {chapter.type === 'story' && (
-        <StoryChapter lines={chapter.content} onComplete={goToNextChapter} />
+        <StoryChapter lines={chapter.content} onComplete={goToNextChapter} chapterId={chapterId} />
       )}
       {chapter.type === 'puzzle' && (
         <PuzzleDisplay puzzle={chapter} onSolved={goToNextChapter} />
