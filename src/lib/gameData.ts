@@ -5,6 +5,7 @@ export interface StoryChapter {
 }
 
 export interface PuzzleChapter{
+    id: string;
     type: "puzzle";
     puzzleType: "QR_SCAN" | "TEXT_INPUT"; // パズルの種類
     question: string; // 問題文
@@ -38,6 +39,7 @@ export const gameData:Record<string, GameChapter> ={
     nextChapterId: 'puzzle-1',
   },
   'puzzle-1': {
+    id: 'puzzle-1',
     type: 'puzzle',
     puzzleType: 'QR_SCAN',
     question: "最初の謎だ。test",
@@ -46,6 +48,7 @@ export const gameData:Record<string, GameChapter> ={
     hint:"ヒント: 部屋の中央をよく見てみろ。",
   },
   'puzzle-2': {
+    id: 'puzzle-2',
     type: 'puzzle',
     puzzleType: 'QR_SCAN',
     question: "順調だ。",
@@ -54,6 +57,7 @@ export const gameData:Record<string, GameChapter> ={
     nextChapterId: 'puzzle-3',
   },
   'puzzle-3': {
+    id: 'puzzle-3',
     type: 'puzzle',
     puzzleType: 'QR_SCAN',
     question: "最後だ",
@@ -82,6 +86,7 @@ export const gameData:Record<string, GameChapter> ={
     nextChapterId: 'puzzle-4',
   },
   'puzzle-4': {
+    id: 'puzzle-4',
     type: 'puzzle',
     puzzleType: 'TEXT_INPUT',
     question: "中央のコンソールに表示された謎を解け。",
@@ -102,6 +107,7 @@ export const gameData:Record<string, GameChapter> ={
     nextChapterId: 'puzzle-5',
   },
   'puzzle-5': {
+    id: 'puzzle-5',
     type: 'puzzle',
     puzzleType: 'TEXT_INPUT',
     question: "壁に投影された最後の謎だ。脱出のキーワードを入力せよ。",
@@ -139,5 +145,10 @@ export const gameData:Record<string, GameChapter> ={
     type: 'ending',
     title: '脱出成功！',
     message: '全ての謎を解き、施設から脱出することができた。',
+  },
+  'failure': {
+    type: 'ending',
+    title: '脱出失敗...',
+    message: '時間切れです。もう一度挑戦してください。',
   },
 };
