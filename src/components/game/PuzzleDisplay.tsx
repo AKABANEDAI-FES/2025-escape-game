@@ -75,8 +75,16 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
       />
 
       <button
-        onClick={() => router.push("/qr-reader")}
+        onClick={handleSubmit}
         className="absolute h-1/15 top-2/3 w-1/5 left-2/5 border border-black flex justify-center items-center text-center"
+      >
+        解答する
+      </button>
+
+      {/* QRコード読み取り画面へ遷移するボタン */}
+      <button
+        onClick={() => router.push("/qr-reader")}
+        className="absolute h-1/15 top-3/4 w-1/5 left-2/5 border border-black flex justify-center items-center text-center"
       >
         QRコードを読み込む
       </button>
