@@ -37,12 +37,6 @@ export default function StoryChapter({ chapterId, lines, onComplete }: StoryChap
   };
   return (
     <div>
-      <button
-        onClick={() => router.push("/log")}
-        className="absolute h-1/15 w-1/5  border border-black flex justify-center items-center text-center"
-      >
-        会話を見る
-      </button>
       <div
         className='absolute bottom-16 h-1/4 w-4/5 left-1/10 border rounded-3xl border-black flex justify-center items-center text-center text-xl'
         onClick={handleNextLine}
