@@ -31,7 +31,7 @@ export default function LogPage() {
     .filter((chapter): chapter is StoryChapter => !!chapter && chapter.type === 'story');
 
   return (
-    <div className="min-h-screen bg-gray-200 text-white p-4 sm:p-6 md:p-8 font-sans">
+    <div className="min-h-screen bg-white p-4 sm:p-6 md:p-8 font-sans">
       <div className="max-w-4xl mx-auto">
         <header className="mb-8 flex justify-between items-center">
           <div>
@@ -48,22 +48,22 @@ export default function LogPage() {
           </div>
           <button
             onClick={() => router.back()}
-            className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
           >
             ゲームに戻る
           </button>
         </header>
 
-        <main className="space-y-6 bg-gray-800/50 p-6 rounded-lg shadow-inner">
+        <main className="space-y-6 bg-white p-6 rounded-lg shadow-inner border-black border">
           {storyLogs.length > 0 ? (
             storyLogs.map((chapter) => (
               <div key={chapter.id} className="border-b border-gray-700 pb-4 last:border-b-0">
-                <h2 className="text-xl font-semibold text-yellow-300 mb-2">
+                <h2 className="text-xl font-semibold text-black mb-2">
                   {/* gameDataにチャプタータイトルがあれば表示、なければIDを表示 */}
                   {/* StoryChapterにtitleはないため、IDを fallback として表示 */}
                   {`チャプター: ${chapter.id}`}
                 </h2>
-                <div className="text-gray-100 whitespace-pre-wrap leading-relaxed">
+                <div className="text-black whitespace-pre-wrap leading-relaxed">
                   {/* contentは文字列配列なので、各行をdivで囲んで表示 */}
                   {chapter.content.map((line, index) => (
                     <p key={index}>{line}</p>
