@@ -1,4 +1,5 @@
 export interface StoryChapter {
+    id: string;
     type: "story";
     content: string[];
     nextChapterId: string;
@@ -30,6 +31,7 @@ export type GameChapter = StoryChapter | PuzzleChapter | ActionChapter | EndingC
 
 export const gameData:Record<string, GameChapter> ={
     'start': {
+    id: 'chapter1',
     type: 'story',
     content: [
       "AI: ようこそ、挑戦者よ。",
@@ -70,6 +72,7 @@ export const gameData:Record<string, GameChapter> ={
    * 中盤: ドア操作と謎解き4
    */
   'door-open-story': {
+    id: 'chapter2-1',
     type: 'story',
     content: ["AI: よくやった。目の前のドアを操作する権限を与える。", "AI: パネルを操作して、次のエリアへ進め。"],
     nextChapterId: 'action-door-open',
@@ -81,6 +84,7 @@ export const gameData:Record<string, GameChapter> ={
     nextChapterId: 'puzzle-4-story',
   },
   'puzzle-4-story': {
+    id: 'chapter2-2',
     type: 'story',
     content: ["AI: このエリアは危険だ。センサーに触れないよう、慎重に進め。"],
     nextChapterId: 'puzzle-4',
@@ -96,6 +100,7 @@ export const gameData:Record<string, GameChapter> ={
   },
 
   'projector-start-story': {
+    id: 'chapter3',
     type: 'story',
     content: ["AI: 残す謎はあと一つ...。部屋の様子が変わる。よく観察しろ。"],
     nextChapterId: 'action-projector-lights-on',
@@ -126,6 +131,7 @@ export const gameData:Record<string, GameChapter> ={
     nextChapterId: 'success-story',
   },
   'success-story': {
+    id: 'clear',
     type: 'story',
     content: ["AI: 見事だ、挑戦者よ。君の勝利だ。", "AI: 出口は目の前だ。"],
     nextChapterId: 'success',
@@ -135,6 +141,7 @@ export const gameData:Record<string, GameChapter> ={
    * ゲームオーバー / クリア画面
    */
   'final-story': {
+    id: 'clear',
     type: 'story',
     content: ["AI: よくやった。これで全ての謎を解き明かした。"],
     nextChapterId: 'success', // ★ 次のチャプターを'success'に設定
