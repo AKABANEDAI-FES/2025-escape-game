@@ -6,6 +6,7 @@ import { useGame } from "@/app/provider/GameProvider";
 import Timer from "./Timer";
 import { useRouter } from "next/navigation";
 import LogPage from "@/app/log/log";
+import ProgressPage from "@/app/progress/progress"
 
 interface PuzzleDisplayProps {
   puzzle: PuzzleChapter;
@@ -101,6 +102,44 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
       >
         会話を見る
       </button> */}
+
+      <input
+            type="checkbox"
+            className="peer/progress-flag hidden"
+            id="progress"
+          />
+      <label
+        className="button-sample2 absolute h-1/15 w-1/5 left-1/4 border border-black flex justify-center items-center text-center"
+        htmlFor="progress"
+      >
+        進捗を見る
+      </label>
+      <div
+            className="popup hidden peer-checked/progress-flag:block z-50"
+            // style={{ left: "calc(50vw - calc(calc(8 / 12 * 100%) / 2))" }}
+          >
+        <ProgressPage />
+        {/* <button
+            onClick={() => router.back()}
+            className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
+          >
+            ゲームに戻る
+          </button> */}
+        <label
+          className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
+          htmlFor="progress"
+          style={{ zIndex: 70 }}
+        >
+          ゲームに戻る
+        </label>
+      </div>
+      {/* <button
+        onClick={() => router.push("/progress")}
+        className="absolute h-1/15 w-1/5  border border-black flex justify-center items-center text-center"
+      >
+        進捗を見る
+      </button> */}
+
       <h2 className="puzzle-question absolute top-32 h-1/3 w-28/30 left-1/30 border rounded-3xl border-black flex justify-center items-center text-center text-xl">
         {puzzle.question}
       </h2>
