@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const CORRECT_QR = 'https://osada-soroban.com/';
 const CONTAINER_ID = 'qr-reader';
@@ -8,6 +9,7 @@ const CONTAINER_ID = 'qr-reader';
 export default function QrReaderPage() {
   const [result, setResult] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => setMounted(true), []);
 
@@ -23,7 +25,6 @@ export default function QrReaderPage() {
 
       const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import('html5-qrcode');
 
-      // ✔ コンストラクタには FullConfig として minimum に verbose を渡す
       html5QrCode = new Html5Qrcode(CONTAINER_ID, { verbose: false });
 
       const devices = await Html5Qrcode.getCameras();
@@ -42,7 +43,6 @@ export default function QrReaderPage() {
         {
           fps: 10,
           qrbox: 250,
-          // ✔ formatsToSupport は start() の設定で渡す
           formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
         },
         (decodedText: string) => {
@@ -71,6 +71,9 @@ export default function QrReaderPage() {
       <h1>QRコード読み取り画面</h1>
       <div id={CONTAINER_ID} style={{ width: 320, height: 320 }} />
       {result && <h2>{result}</h2>}
+      <button onClick={() => router.back()} style={{ marginTop: 16 }}>
+        問題に戻る
+      </button>
     </div>
   );
 }
