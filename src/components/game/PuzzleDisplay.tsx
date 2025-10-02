@@ -82,12 +82,7 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
             // style={{ left: "calc(50vw - calc(calc(8 / 12 * 100%) / 2))" }}
           >
         <LogPage />
-        {/* <button
-            onClick={() => router.back()}
-            className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
-          >
-            ゲームに戻る
-          </button> */}
+
         <label
           className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
           htmlFor="log"
@@ -96,12 +91,7 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
           ゲームに戻る
         </label>
       </div>
-      {/* <button
-        onClick={() => router.push("/log")}
-        className="absolute h-1/15 w-1/5  border border-black flex justify-center items-center text-center"
-      >
-        会話を見る
-      </button> */}
+
 
       <input
             type="checkbox"
