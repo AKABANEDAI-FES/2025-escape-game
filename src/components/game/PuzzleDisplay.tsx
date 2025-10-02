@@ -78,7 +78,7 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
         会話を見る
       </label>
       <div
-            className="popup hidden peer-checked/log-flag:block z-50"
+            className="popup fixed inset-0 hidden peer-checked/log-flag:block z-50"
             // style={{ left: "calc(50vw - calc(calc(8 / 12 * 100%) / 2))" }}
           >
         <LogPage />
@@ -109,13 +109,13 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
             id="progress"
           />
       <label
-        className="button-sample2 absolute h-1/15 w-1/5 left-1/4 border border-black flex justify-center items-center text-center"
+        className="button-sample2 absolute h-1/15 w-1/5 left-7/30 border border-black flex justify-center items-center text-center"
         htmlFor="progress"
       >
         進捗を見る
       </label>
       <div
-            className="popup hidden peer-checked/progress-flag:block z-50"
+            className="popup fixed inset-0 hidden peer-checked/progress-flag:block z-50"
             // style={{ left: "calc(50vw - calc(calc(8 / 12 * 100%) / 2))" }}
           >
         <ProgressPage />
