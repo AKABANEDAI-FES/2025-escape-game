@@ -12,6 +12,7 @@ export interface PuzzleChapter {
   question: string; // 問題文
   answer: string; // 答え
   qrData?: string; // QRコードのデータ（QR_SCANの場合）
+  imageUrl?: string; // 画像URL
   hint: string; // ヒント
   nextChapterId: string; // 次の章のID
 }
@@ -54,6 +55,7 @@ export const gameData: Record<string, GameChapter> = {
 　カレンダーから　965=ちょう
 　⇒蝶の絵の裏`,
     qrData: "id1",
+    imageUrl: "/image/question/question1.png",
     nextChapterId: "puzzle-2",
     hint: "ヒント: 部屋の中央をよく見てみろ。",
   },
@@ -66,6 +68,7 @@ export const gameData: Record<string, GameChapter> = {
 　本のページを鏡に映すとドクロ
 　⇒ドクロの中`,
     qrData: "id2",
+    imageUrl: "/image/question/question2.png",
     hint: "ヒント: 部屋の隅に注意してみろ。",
     nextChapterId: "puzzle-3",
   },
@@ -78,6 +81,7 @@ export const gameData: Record<string, GameChapter> = {
 　*未定*
 　*未定*
 　⇒スタッフが持っている`,
+    imageUrl: "/image/question/question3.png",
     qrData: "id3",
     hint: "ヒント: 高い場所を探せ。",
     nextChapterId: "door-open-story",
