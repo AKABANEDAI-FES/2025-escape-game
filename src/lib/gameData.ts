@@ -44,8 +44,11 @@ export const gameData:Record<string, GameChapter> ={
     id: 'puzzle-1',
     type: 'puzzle',
     puzzleType: 'QR_SCAN',
-    question: "最初の謎だ。test",
-    answer: "test", // QRコードに埋め込むデータ
+    question: "謎を解き、その答えの裏を見ろ。",
+    answer:
+     `黒猫=9匹　灰色猫=6匹　三毛猫=5匹
+　カレンダーから　965=ちょう
+　⇒蝶の絵の裏`, // QRコードに埋め込むデータ
     nextChapterId: 'puzzle-2',
     hint:"ヒント: 部屋の中央をよく見てみろ。",
   },
@@ -53,8 +56,11 @@ export const gameData:Record<string, GameChapter> ={
     id: 'puzzle-2',
     type: 'puzzle',
     puzzleType: 'QR_SCAN',
-    question: "順調だ。",
-    answer: "test",
+    question: "謎を解き、その答えの物を見ろ。",
+    answer:
+     `❤︎♠︎♠︎♦︎=book
+　本のページを鏡に映すとドクロ
+　⇒ドクロの中`,
     hint: "ヒント: 部屋の隅に注意してみろ。",
     nextChapterId: 'puzzle-3',
   },
@@ -62,8 +68,11 @@ export const gameData:Record<string, GameChapter> ={
     id: 'puzzle-3',
     type: 'puzzle',
     puzzleType: 'QR_SCAN',
-    question: "最後だ",
-    answer: "test",
+    question: "謎を解き、その答えに耳を近づけろ。",
+    answer: `男子を逆から読むと「しんだ」　⇒女子
+　*未定*
+　*未定*
+　⇒スタッフが持っている`,
     hint: "ヒント: 高い場所を探せ。",
     nextChapterId: 'door-open-story',
   },
