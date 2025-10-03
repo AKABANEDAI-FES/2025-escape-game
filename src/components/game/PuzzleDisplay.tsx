@@ -45,14 +45,14 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
   }, [hintCountdown, puzzle.hint]);
 
   const handleSubmit = () => {
-    if (playerInput.toUpperCase() === puzzle.answer.toUpperCase()) {
+    if (playerInput.toUpperCase() === puzzle.qrData?.toUpperCase()) {
       setErrorMessage("");
       setHintMessage("");
       setGameState((prev) => ({
         ...prev,
         solvedPuzzles: [
           ...prev.solvedPuzzles,
-          { id: puzzle.id, question: puzzle.question, answer: puzzle.answer },
+          { id: puzzle.id, question: puzzle.question  , answer: puzzle.answer },
         ],
       }));
       onSolved();
