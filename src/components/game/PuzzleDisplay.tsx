@@ -16,11 +16,12 @@ interface PuzzleDisplayProps {
 export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) {
   const { pauseTimer, resumeTimer, setGameState } = useGame();
   const router = useRouter();
-
   const [playerInput, setPlayerInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [hintMessage, setHintMessage] = useState("");
 
+  // 現在のチャプターにimageがあるかどうかを判定
+  const isImageActive = puzzle.imageUrl !== 'noimage';
   // ---- ヒント用タイマー ----
   const [hintCountdown, setHintCountdown] = useState(10); 
 
@@ -115,10 +116,12 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
         </label>
       </div>
 
-
-      <h2 className="puzzle-question absolute top-32 h-1/3 w-28/30 left-1/30 border rounded-3xl border-black flex justify-center items-center text-center text-xl">
-        {puzzle.question}
-      </h2>
+      <div className="flex justify-center items-center text-center">
+        <h2 className="puzzle-question absolute top-32 h-2/5 w-28/30 left-1/30 border rounded-3xl border-black text-xl">
+          {puzzle.question}
+        </h2>
+        {isImageActive && <img src={puzzle.imageUrl} alt="問題の画像" height={500} width="450" className="fixed top-1/5"/>}
+      </div>
       <input
         type="text"
         value={playerInput}
