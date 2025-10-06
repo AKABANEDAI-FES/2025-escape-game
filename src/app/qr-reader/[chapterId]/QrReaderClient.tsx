@@ -3,18 +3,41 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const CORRECT_QR = 'https://osada-soroban.com/';
 const CONTAINER_ID = 'qr-reader';
 
-export default function QrReaderPage() {
+function normalizeUrl(u: string) {
+  try {
+    const t = u.trim();
+    if (!t) return '';
+    const url = new URL(t);
+    url.pathname = url.pathname.replace(/\/+$/, '');
+    return url.toString().toLowerCase();
+  } catch {
+    return u.trim().replace(/\/+$/, '').toLowerCase();
+  }
+}
+
+export default function QrReaderClient({
+  chapterId,
+  correctUrl,
+  nextChapterId,
+}: {
+  chapterId: string;
+  correctUrl: string;
+  nextChapterId: string | null;
+}) {
+  const router = useRouter();
   const [result, setResult] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
-  const router = useRouter();
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!mounted) return;
+    if (!correctUrl) {
+      setResult('このチャプターはQRスキャンではないか、正解URLが設定されていません。');
+      return;
+    }
 
     let html5QrCode: any | null = null;
     let active = true;
@@ -24,7 +47,6 @@ export default function QrReaderPage() {
       if (!el) return;
 
       const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import('html5-qrcode');
-
       html5QrCode = new Html5Qrcode(CONTAINER_ID, { verbose: false });
 
       const devices = await Html5Qrcode.getCameras();
@@ -33,13 +55,13 @@ export default function QrReaderPage() {
         return;
       }
 
-      const back = devices.find(d => {
-        const label = (d.label || '').toLowerCase();
-        return label.includes('back') || label.includes('rear') || label.includes('environment');
-      }) ?? devices[0];
+      const back =
+        devices.find((d) => {
+          const label = (d.label || '').toLowerCase();
+          return label.includes('back') || label.includes('rear') || label.includes('environment');
+        }) ?? devices[0];
 
       await html5QrCode.start(
-        { facingMode: { exact: 'environment' } },
         back.id,
         {
           fps: 10,
@@ -47,16 +69,21 @@ export default function QrReaderPage() {
           formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
         },
         (decodedText: string) => {
-          const ok = decodedText.trim().toLowerCase() === CORRECT_QR.trim().toLowerCase();
+          const ok = normalizeUrl(decodedText) === normalizeUrl(correctUrl);
           if (ok) {
-            router.push('game'); //QRコード正解時、遷移
+            // ✅ 正解時は次のチャプターへ
+            if (nextChapterId) {
+              router.push(`/game/${nextChapterId}`);
+            } else {
+              router.push('/game');
+            }
           } else {
             setResult('違うみたい…');
           }
         },
         () => {}
       );
-    })().catch(err => {
+    })().catch((err) => {
       console.error(err);
       setResult('カメラの起動に失敗しました');
     });
@@ -67,17 +94,17 @@ export default function QrReaderPage() {
         html5QrCode.stop().then(() => html5QrCode?.clear()).catch(() => {});
       }
     };
-  }, [mounted]);
+  }, [mounted, correctUrl, router, nextChapterId]);
 
   if (!mounted) return null;
 
   return (
     <div>
-      <h1>QRコード読み取り画面</h1>
+      <h1>QRコード読み取り</h1>
       <div id={CONTAINER_ID} style={{ width: 320, height: 320 }} />
-      {result && <h2>{result}</h2>}
+      {result && <h2 style={{ marginTop: 12 }}>{result}</h2>}
       <button onClick={() => router.back()} style={{ marginTop: 16 }}>
-        問題に戻る
+        戻る
       </button>
     </div>
   );

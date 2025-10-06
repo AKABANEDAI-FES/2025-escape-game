@@ -45,7 +45,7 @@ export const gameData:Record<string, GameChapter> ={
     type: 'puzzle',
     puzzleType: 'QR_SCAN',
     question: "最初の謎だ。test",
-    answer: "test", // QRコードに埋め込むデータ
+    answer: "https://osada-soroben.com", // QRコードに埋め込むデータ
     nextChapterId: 'puzzle-2',
     hint:"ヒント: 部屋の中央をよく見てみろ。",
   },
