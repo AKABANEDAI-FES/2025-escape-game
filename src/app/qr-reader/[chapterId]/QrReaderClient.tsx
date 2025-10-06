@@ -71,7 +71,7 @@ export default function QrReaderClient({
         (decodedText: string) => {
           const ok = normalizeUrl(decodedText) === normalizeUrl(correctUrl);
           if (ok) {
-            // ✅ 正解時は次のチャプターへ
+            // 正解時は次のチャプターへ
             if (nextChapterId) {
               router.push(`/game/${nextChapterId}`);
             } else {

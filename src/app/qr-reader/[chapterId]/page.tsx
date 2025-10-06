@@ -4,18 +4,17 @@ import QrReaderClient from './QrReaderClient';
 
 export async function generateStaticParams() {
   const chapterIds = Object.keys(gameData);
-  return chapterIds.map((id) => ({
-    chapterId: id,
-  }));
+  return chapterIds.map((id) => ({ chapterId: id }));
 }
 
-export default function QrReaderByChapterPage({
+export default async function QrReaderByChapterPage({
   params,
 }: {
-  params: { chapterId: string };
+  params: Promise<{ chapterId: string }>;
 }) {
-  const chapter = gameData[params.chapterId];
+  const { chapterId } = await params;
 
+  const chapter = gameData[chapterId];
   if (!chapter || chapter.type !== 'puzzle' || chapter.puzzleType !== 'QR_SCAN') {
     notFound();
   }
@@ -25,7 +24,7 @@ export default function QrReaderByChapterPage({
 
   return (
     <QrReaderClient
-      chapterId={params.chapterId}
+      chapterId={chapterId}
       correctUrl={correctUrl}
       nextChapterId={nextChapterId}
     />
