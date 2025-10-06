@@ -75,7 +75,7 @@ export default function QrReaderClient({
             if (nextChapterId) {
               router.push(`/game/${nextChapterId}`);
             } else {
-              router.push('/game');
+              router.push('/success');
             }
           } else {
             setResult('違うみたい…');

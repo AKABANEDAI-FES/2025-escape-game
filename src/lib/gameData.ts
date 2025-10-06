@@ -114,7 +114,7 @@ export const gameData:Record<string, GameChapter> ={
   'puzzle-5': {
     id: 'puzzle-5',
     type: 'puzzle',
-    puzzleType: 'TEXT_INPUT',
+    puzzleType: 'QR_SCAN',
     question: "壁に投影された最後の謎だ。脱出のキーワードを入力せよ。",
     answer: "test",
     nextChapterId: 'action-final-projector',
