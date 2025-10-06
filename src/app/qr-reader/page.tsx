@@ -39,6 +39,7 @@ export default function QrReaderPage() {
       }) ?? devices[0];
 
       await html5QrCode.start(
+        { facingMode: { exact: 'environment' } },
         back.id,
         {
           fps: 10,
@@ -47,7 +48,11 @@ export default function QrReaderPage() {
         },
         (decodedText: string) => {
           const ok = decodedText.trim().toLowerCase() === CORRECT_QR.trim().toLowerCase();
-          setResult(ok ? '正解！' : '違うみたい…');
+          if (ok) {
+            router.push('game'); //QRコード正解時、遷移
+          } else {
+            setResult('違うみたい…');
+          }
         },
         () => {}
       );
