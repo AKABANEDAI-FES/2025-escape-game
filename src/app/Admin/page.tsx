@@ -13,9 +13,10 @@ export default function Admin() {
     resumeTimer,
     currentChapterId,
     setCurrentChapterId,
+    difficulty,
   } = useGame();
   const router = useRouter();
-
+  // ローカルステートで分と秒を管理  
   const [minutes, setMinutes] = useState(5);
   const [seconds, setSeconds] = useState(0);
   const [selectedChapter, setSelectedChapter] = useState(currentChapterId);
@@ -48,6 +49,10 @@ export default function Admin() {
       </p>
 
       <div className="border-t border-gray-300 pt-4 space-y-4">
+       <div className="flex justify-between items-center">
+          <span className="font-semibold">難易度:</span>
+          <span className="text-blue-600 font-bold">{difficulty}</span>
+        </div>
         <div className="flex justify-between items-center">
           <span className="font-semibold">現在のチャプター:</span>
           <span className="text-blue-600 font-bold">{currentChapterId}</span>

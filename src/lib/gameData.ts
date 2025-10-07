@@ -13,7 +13,7 @@ export interface PuzzleChapter {
   answer: string; // 答え
   qrData?: string; // QRコードのデータ（QR_SCANの場合）
   imageUrl?: string; // 画像URL
-  hint: string; // ヒント
+  hint: string[]; // ヒント
   nextChapterId: string; // 次の章のID
 }
 
@@ -57,7 +57,7 @@ export const gameData: Record<string, GameChapter> = {
     qrData: "id1",
     imageUrl: "/image/question/question1.png",
     nextChapterId: "puzzle-2",
-    hint: "ヒント: 部屋の中央をよく見てみろ。",
+    hint: ["ヒント: 部屋の中央をよく見てみろ。","ヒント２"],
   },
   "puzzle-2": {
     id: "puzzle-2",
@@ -69,7 +69,7 @@ export const gameData: Record<string, GameChapter> = {
 　⇒ドクロの中`,
     qrData: "id2",
     imageUrl: "/image/question/question2.png",
-    hint: "ヒント: 部屋の隅に注意してみろ。",
+    hint: ["ヒント: 部屋の隅に注意してみろ。", "ヒント２"],
     nextChapterId: "puzzle-3",
   },
   "puzzle-3": {
@@ -83,13 +83,11 @@ export const gameData: Record<string, GameChapter> = {
 　⇒スタッフが持っている`,
     imageUrl: "/image/question/question3.png",
     qrData: "id3",
-    hint: "ヒント: 高い場所を探せ。",
+    hint: ["ヒント: 高い場所を探せ。", "ヒント２"],
     nextChapterId: "door-open-story",
   },
 
-  /**
-   * 中盤: ドア操作と謎解き4
-   */
+
   "door-open-story": {
     id: "chapter2-1",
     type: "story",
@@ -119,7 +117,7 @@ export const gameData: Record<string, GameChapter> = {
     answer: "test",
     imageUrl: "noimage",
     nextChapterId: "projector-start-story",
-    hint: "ヒント: 部屋の壁に注目してみろ。",
+    hint: ["ヒント: 部屋の壁に注目してみろ。", "ヒント２"],
   },
 
   "projector-start-story": {
@@ -142,7 +140,7 @@ export const gameData: Record<string, GameChapter> = {
     answer: "test",
     imageUrl: "noimage",
     nextChapterId: "action-final-projector",
-    hint: "ヒント: 部屋の中央に注目してみろ。",
+    hint: ["ヒント: 部屋の中央に注目してみろ。", "ヒント２"],
   },
 
   /**

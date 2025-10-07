@@ -6,14 +6,17 @@ import { useGame } from "@/app/provider/GameProvider";
 import Timer from "./Timer";
 import { useRouter } from "next/navigation";
 import LogPage from "@/app/log/log";
-import ProgressPage from "@/app/progress/progress"
+import ProgressPage from "@/app/progress/progress";
 
 interface PuzzleDisplayProps {
   puzzle: PuzzleChapter;
   onSolved: () => void;
 }
 
-export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) {
+export default function PuzzleDisplay({
+  puzzle,
+  onSolved,
+}: PuzzleDisplayProps) {
   const { pauseTimer, resumeTimer, setGameState } = useGame();
   const router = useRouter();
   const [playerInput, setPlayerInput] = useState("");
@@ -21,9 +24,9 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
   const [hintMessage, setHintMessage] = useState("");
 
   // 現在のチャプターにimageがあるかどうかを判定
-  const isImageActive = puzzle.imageUrl !== 'noimage';
+  const isImageActive = puzzle.imageUrl !== "noimage";
   // ---- ヒント用タイマー ----
-  const [hintCountdown, setHintCountdown] = useState(10); 
+  const [hintCountdown, setHintCountdown] = useState(10);
 
   useEffect(() => {
     resumeTimer();
@@ -34,16 +37,18 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
 
   // ヒント用タイマー
   useEffect(() => {
-    if (hintCountdown <= 0) {
-      setHintMessage(puzzle.hint); // カウント0になったらヒント表示
-      return;
-    }
     const timer = setInterval(() => {
-      setHintCountdown((prev) => prev - 1);
+      setHintCountdown((prev) => {
+        if (prev <= 1) {
+          setHintMessage(puzzle.hint[0]);
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
-
     return () => clearInterval(timer);
-  }, [hintCountdown, puzzle.hint]);
+  }, [puzzle.hint]);
 
   const handleSubmit = () => {
     if (playerInput.toUpperCase() === puzzle.qrData?.toUpperCase()) {
@@ -53,7 +58,7 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
         ...prev,
         solvedPuzzles: [
           ...prev.solvedPuzzles,
-          { id: puzzle.id, question: puzzle.question  , answer: puzzle.answer },
+          { id: puzzle.id, question: puzzle.question, answer: puzzle.answer },
         ],
       }));
       onSolved();
@@ -67,20 +72,14 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
       <div className="absolute h-1/15 top-1/30 w-1/10 right-1/30 border rounded-xl border-black flex justify-center items-center text-center">
         <Timer />
       </div>
-      <input
-            type="checkbox"
-            className="peer/log-flag hidden"
-            id="log"
-          />
+      <input type="checkbox" className="peer/log-flag hidden" id="log" />
       <label
         className="button-sample1 absolute h-1/15 w-1/5  border border-black flex justify-center items-center text-center"
         htmlFor="log"
       >
         会話を見る
       </label>
-      <div
-            className="popup fixed inset-0 hidden peer-checked/log-flag:block z-50"
-          >
+      <div className="popup fixed inset-0 hidden peer-checked/log-flag:block z-50">
         <LogPage />
         <label
           className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
@@ -92,19 +91,17 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
       </div>
 
       <input
-            type="checkbox"
-            className="peer/progress-flag hidden"
-            id="progress"
-          />
+        type="checkbox"
+        className="peer/progress-flag hidden"
+        id="progress"
+      />
       <label
         className="button-sample2 absolute h-1/15 w-1/5 left-7/30 border border-black flex justify-center items-center text-center"
         htmlFor="progress"
       >
         進捗を見る
       </label>
-      <div
-            className="popup fixed inset-0 hidden peer-checked/progress-flag:block z-50"
-          >
+      <div className="popup fixed inset-0 hidden peer-checked/progress-flag:block z-50">
         <ProgressPage />
 
         <label
@@ -120,7 +117,15 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
         <h2 className="puzzle-question absolute top-32 h-2/5 w-28/30 left-1/30 border rounded-3xl border-black text-xl">
           {puzzle.question}
         </h2>
-        {isImageActive && <img src={puzzle.imageUrl} alt="問題の画像" height={500} width="450" className="fixed top-1/5"/>}
+        {isImageActive && (
+          <img
+            src={puzzle.imageUrl}
+            alt="問題の画像"
+            height={500}
+            width="450"
+            className="fixed top-1/5"
+          />
+        )}
       </div>
       <input
         type="text"
