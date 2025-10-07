@@ -9,6 +9,7 @@ export interface GameState {
   solvedPuzzles: SolvedPuzzle[];
   viewedStoryChapters: string[];
   isTimerPaused:boolean;
+  difficulty: "easy" | "normal";
 }
 export interface SolvedPuzzle {
   id: string;
@@ -22,6 +23,7 @@ const initialGameState: GameState = {
   solvedPuzzles: [],
   viewedStoryChapters: [],
   isTimerPaused: false,
+  difficulty: "easy",
 };
 
 export function usePersistentGameState() {
