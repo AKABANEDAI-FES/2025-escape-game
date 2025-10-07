@@ -134,10 +134,10 @@ export const gameData: Record<string, GameChapter> = {
     message: "システムを最終モードに移行します...",
     nextChapterId: "puzzle-5",
   },
-  "puzzle-5": {
-    id: "puzzle-5",
-    type: "puzzle",
-    puzzleType: "TEXT_INPUT",
+  'puzzle-5': {
+    id: 'puzzle-5',
+    type: 'puzzle',
+    puzzleType: 'QR_SCAN',
     question: "壁に投影された最後の謎だ。脱出のキーワードを入力せよ。",
     answer: "test",
     imageUrl: "noimage",
