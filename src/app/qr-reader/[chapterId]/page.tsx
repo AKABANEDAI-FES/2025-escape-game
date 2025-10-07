@@ -19,7 +19,7 @@ export default async function QrReaderByChapterPage({
     notFound();
   }
 
-  const correctUrl = chapter.answer || '';
+  const correctUrl = chapter.qrData || '';
   const nextChapterId = 'nextChapterId' in chapter ? chapter.nextChapterId : null;
 
   return (
