@@ -16,7 +16,6 @@ export default function SuccessScreen({ title, message }: SuccessScreenProps) {
     pauseTimer();
   }, [pauseTimer]);
   const handleRestart = () => {
-    // スタートページ('/')に戻る
     router.push('/');
   };
   return (

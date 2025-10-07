@@ -16,11 +16,12 @@ interface PuzzleDisplayProps {
 export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) {
   const { pauseTimer, resumeTimer, setGameState } = useGame();
   const router = useRouter();
-
   const [playerInput, setPlayerInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [hintMessage, setHintMessage] = useState("");
 
+  // 現在のチャプターにimageがあるかどうかを判定
+  const isImageActive = puzzle.imageUrl !== 'noimage';
   // ---- ヒント用タイマー ----
   const [hintCountdown, setHintCountdown] = useState(10); 
 
@@ -45,14 +46,14 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
   }, [hintCountdown, puzzle.hint]);
 
   const handleSubmit = () => {
-    if (playerInput.toUpperCase() === puzzle.answer.toUpperCase()) {
+    if (playerInput.toUpperCase() === puzzle.qrData?.toUpperCase()) {
       setErrorMessage("");
       setHintMessage("");
       setGameState((prev) => ({
         ...prev,
         solvedPuzzles: [
           ...prev.solvedPuzzles,
-          { id: puzzle.id, question: puzzle.question, answer: puzzle.answer },
+          { id: puzzle.id, question: puzzle.question  , answer: puzzle.answer },
         ],
       }));
       onSolved();
@@ -79,15 +80,8 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
       </label>
       <div
             className="popup fixed inset-0 hidden peer-checked/log-flag:block z-50"
-            // style={{ left: "calc(50vw - calc(calc(8 / 12 * 100%) / 2))" }}
           >
         <LogPage />
-        {/* <button
-            onClick={() => router.back()}
-            className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
-          >
-            ゲームに戻る
-          </button> */}
         <label
           className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
           htmlFor="log"
@@ -96,12 +90,6 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
           ゲームに戻る
         </label>
       </div>
-      {/* <button
-        onClick={() => router.push("/log")}
-        className="absolute h-1/15 w-1/5  border border-black flex justify-center items-center text-center"
-      >
-        会話を見る
-      </button> */}
 
       <input
             type="checkbox"
@@ -116,15 +104,9 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
       </label>
       <div
             className="popup fixed inset-0 hidden peer-checked/progress-flag:block z-50"
-            // style={{ left: "calc(50vw - calc(calc(8 / 12 * 100%) / 2))" }}
           >
         <ProgressPage />
-        {/* <button
-            onClick={() => router.back()}
-            className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
-          >
-            ゲームに戻る
-          </button> */}
+
         <label
           className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
           htmlFor="progress"
@@ -133,16 +115,13 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
           ゲームに戻る
         </label>
       </div>
-      {/* <button
-        onClick={() => router.push("/progress")}
-        className="absolute h-1/15 w-1/5  border border-black flex justify-center items-center text-center"
-      >
-        進捗を見る
-      </button> */}
 
-      <h2 className="puzzle-question absolute top-32 h-1/3 w-28/30 left-1/30 border rounded-3xl border-black flex justify-center items-center text-center text-xl">
-        {puzzle.question}
-      </h2>
+      <div className="flex justify-center items-center text-center">
+        <h2 className="puzzle-question absolute top-32 h-2/5 w-28/30 left-1/30 border rounded-3xl border-black text-xl">
+          {puzzle.question}
+        </h2>
+        {isImageActive && <img src={puzzle.imageUrl} alt="問題の画像" height={500} width="450" className="fixed top-1/5"/>}
+      </div>
       <input
         type="text"
         value={playerInput}
