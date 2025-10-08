@@ -14,6 +14,7 @@ export default function Admin() {
     currentChapterId,
     setCurrentChapterId,
     difficulty,
+    obtainedItems,
   } = useGame();
   const router = useRouter();
   // ローカルステートで分と秒を管理  
@@ -52,6 +53,10 @@ export default function Admin() {
        <div className="flex justify-between items-center">
           <span className="font-semibold">難易度:</span>
           <span className="text-blue-600 font-bold">{difficulty}</span>
+        </div>
+       <div className="flex justify-between items-center">
+          <span className="font-semibold">アイテム:</span>
+          <span className="text-blue-600 font-bold">{obtainedItems}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="font-semibold">現在のチャプター:</span>
