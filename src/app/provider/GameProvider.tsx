@@ -17,6 +17,7 @@ interface GameContextType {
   solvedPuzzles: SolvedPuzzle[];
   viewedStoryChapters: string[];
   difficulty: "easy" | "normal";
+  obtainedItems: string[];
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
