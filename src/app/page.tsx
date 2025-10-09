@@ -8,12 +8,12 @@ export default function Home() {
   const [level, setlevel] = useState(0);// 難易度用ローカル変数(0:normal,1:easy)
   const start = () => {
     if(level === 0){
-        return setGameState(prev=>({...prev, difficulty:"normal"}));
+        setGameState(prev=>({...prev, difficulty:"normal"}));
       }
     else if(level === 1){
-      return setGameState(prev=>({...prev, difficulty:"easy"}));
+      setGameState(prev=>({...prev, difficulty:"easy"}));
     }
-    resetGame;
+    resetGame();
   }
     return (
     <main>
