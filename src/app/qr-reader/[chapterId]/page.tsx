@@ -27,6 +27,7 @@ export default async function QrReaderByChapterPage({
       chapterId={chapterId}
       correctUrl={correctUrl}
       nextChapterId={nextChapterId}
+      answer={chapter.answer || ''}
     />
   );
 }

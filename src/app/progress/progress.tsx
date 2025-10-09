@@ -33,22 +33,14 @@ export default function ProgressPage() {
         <header className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-black">進行状況</h1>
-            {/* パズルがアクティブな場合のみ残り時間を表示 */}
             {isPuzzleActive && remainingTime !== undefined && (
-            //   <div className="text-xl text-red-400 mt-2 animate-pulse">
-            //     残り時間: {formatTime(remainingTime)}
-            //   </div>
+
             <div className="absolute h-1/15 top-1/30 w-1/10 right-1/30 border rounded-xl border-black flex justify-center items-center text-center text-black">
                 <Timer />
             </div>
             )}
           </div>
-          {/* <button
-            onClick={() => router.back()}
-            className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
-          >
-            ゲームに戻る
-          </button> */}
+
           <label
           className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
           htmlFor="progress"

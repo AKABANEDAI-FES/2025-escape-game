@@ -20,11 +20,13 @@ function normalizeUrl(u: string) {
 
 export default function QrReaderClient({
   correctUrl,
-  nextChapterId,
+  nextChapterId,  
+  answer
 }: {
   chapterId: string;
   correctUrl: string;
   nextChapterId: string | null;
+  answer: string;
 }) {
   const router = useRouter();
   const [result, setResult] = useState<string | null>(null);
@@ -36,8 +38,9 @@ export default function QrReaderClient({
     id6: "銀の鍵",
     id7: "謎のアイテム",
   };
+
   const handleItemScan = (scannedItem: string) => {
-    setGameState(prev => {
+    setGameState((prev) => {
       if (prev.obtainedItems.includes(scannedItem)) {
         return prev;
       }
@@ -46,6 +49,17 @@ export default function QrReaderClient({
         obtainedItems: [...prev.obtainedItems, scannedItem],
       };
     });
+  };
+
+  // ✅ 新しく追加: 正解時に「解いたパズル」として登録
+  const handlePuzzleSolved = (correctUrl: string) => {
+    setGameState((prev) => ({
+      ...prev,
+      solvedPuzzles: [
+        ...prev.solvedPuzzles,
+        { id: correctUrl, question: "QR問題", answer: answer },
+      ],
+    }));
   };
 
   useEffect(() => setMounted(true), []);
@@ -86,7 +100,7 @@ export default function QrReaderClient({
             label.includes("environment")
           );
         }) ?? devices[0];
-      
+
       await html5QrCode.start(
         back.id,
         {
@@ -96,13 +110,17 @@ export default function QrReaderClient({
         },
         (decodedText: string) => {
           const ok = normalizeUrl(decodedText) === normalizeUrl(correctUrl);
-          const matchedItem = Object.entries(items).find(([id]) => id === decodedText);
-          const alreadyObtained = matchedItem ? obtainedItems.includes(matchedItem[1]) : false;
-          if (matchedItem) {
-            setResult(`${matchedItem[1]}を取得しました`);
-          }
+          const matchedItem = Object.entries(items).find(
+            ([id]) => id === decodedText
+          );
+          const alreadyObtained = matchedItem
+            ? obtainedItems.includes(matchedItem[1])
+            : false;
+
           if (ok) {
-            // 正解時は次のチャプターへ
+            // ✅ 正解時：ゲーム進行・状態更新
+            setResult("正解です！");
+            handlePuzzleSolved(correctUrl); // ← ここで状態更新！
             if (nextChapterId) {
               router.push(`/game/${nextChapterId}`);
             } else {
