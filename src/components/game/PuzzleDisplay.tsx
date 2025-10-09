@@ -17,12 +17,13 @@ export default function PuzzleDisplay({
   puzzle,
   onSolved,
 }: PuzzleDisplayProps) {
-  const { pauseTimer, resumeTimer, setGameState } = useGame();
+  const { pauseTimer, resumeTimer, setGameState, difficulty } = useGame();
   const router = useRouter();
   const [playerInput, setPlayerInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [hintMessage, setHintMessage] = useState("");
 
+  const isNormal = difficulty === "normal";
   // 現在のチャプターにimageがあるかどうかを判定
   const isImageActive = puzzle.imageUrl !== "noimage";
   // ---- ヒント用タイマー ----
@@ -40,7 +41,12 @@ export default function PuzzleDisplay({
     const timer = setInterval(() => {
       setHintCountdown((prev) => {
         if (prev <= 1) {
-          setHintMessage(puzzle.hint[0]);
+          if (isNormal) {
+            setHintMessage(puzzle.hint[0]);
+          }
+          else {
+            setHintMessage(puzzle.hint.join());
+          }
           clearInterval(timer);
           return 0;
         }
