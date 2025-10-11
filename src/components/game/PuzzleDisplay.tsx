@@ -18,7 +18,7 @@ export default function PuzzleDisplay({
   puzzle,
   onSolved,
 }: PuzzleDisplayProps) {
-  const { pauseTimer, resumeTimer, setGameState } = useGame();
+  const { pauseTimer, resumeTimer, setGameState, difficulty } = useGame();
   const router = useRouter();
   const [playerInput, setPlayerInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -177,7 +177,7 @@ export default function PuzzleDisplay({
               ×
             </label>
             <div className="content p-3 text-center">
-              <p className="text-2xl">{hintMessage}</p>
+              <p className="text-2xl whitespace-pre-line">{hintMessage}</p>
             </div>
           </div>
         </>
