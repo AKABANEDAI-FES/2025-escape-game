@@ -1,23 +1,16 @@
 name: Check & Deploy Next.js App
 
 on:
-  # mainブランチにプッシュされた時に実行
   push:
     branches: ["main"]
-  # mainブランチへのプルリクエスト作成・更新時に実行
   pull_request:
     branches: ["main"]
-  # Actionsタブから手動でも実行可能
   workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -26,42 +19,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # GitHub Pagesの設定を読み込み、base_pathなどを準備します
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v5
-
-      # Node.jsとnpmの環境をセットアップします
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20" # Node.jsのバージョン
+          node-version: "20"
           cache: "npm"
-
       - name: Install dependencies
         run: npm ci
 
-      # Next.jsアプリをビルドします
       - name: Build with Next.js
-        # ここで環境変数 BASE_PATH にリポジトリ名が自動で設定されます
-        env:
-          BASE_PATH: ${{ steps.pages.outputs.base_path }}
         run: npm run build
 
-      # ビルドされた成果物 (outフォルダ) をアップロードします
       - name: Upload artifact
+        if: github.event_name == 'push'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
 
   deploy:
-    # このジョブは、mainブランチへのpushの時だけ実行されます
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
