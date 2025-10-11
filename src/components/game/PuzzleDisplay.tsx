@@ -7,6 +7,7 @@ import Timer from "./Timer";
 import { useRouter } from "next/navigation";
 import LogPage from "@/app/log/log";
 import ProgressPage from "@/app/progress/progress";
+import Image from "next/image";
 
 interface PuzzleDisplayProps {
   puzzle: PuzzleChapter;
@@ -24,10 +25,6 @@ export default function PuzzleDisplay({
   const [hintMessage, setHintMessage] = useState("");
 
   const isNormal = difficulty === "normal";
-  // 現在のチャプターにimageがあるかどうかを判定
-  const isImageActive = puzzle.imageUrl !== "noimage";
-  // ---- ヒント用タイマー ----
-  const [hintCountdown, setHintCountdown] = useState(10);
 
   useEffect(() => {
     resumeTimer();
@@ -36,25 +33,20 @@ export default function PuzzleDisplay({
     };
   }, [pauseTimer, resumeTimer]);
 
-  // ヒント用タイマー
+  // ヒント表示のロジック
   useEffect(() => {
-    const timer = setInterval(() => {
-      setHintCountdown((prev) => {
-        if (prev <= 1) {
-          if (isNormal) {
-            setHintMessage(puzzle.hint[0]);
-          }
-          else {
-            setHintMessage(puzzle.hint.join("\n"));
-          }
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [puzzle.hint]);
+    // 10秒後にヒントを表示するタイマー
+    const hintTimer = setTimeout(() => {
+      if (puzzle.hint && puzzle.hint.length > 0) {
+        // 難易度に応じて表示するヒントの内容を決定
+        const message = isNormal ? puzzle.hint[0] : puzzle.hint.join("\n");
+        setHintMessage(message);
+      }
+    }, 10000); // 10秒
+
+    // コンポーネントが再描画、またはアンマウントされる際にタイマーをクリア
+    return () => clearTimeout(hintTimer);
+  }, [puzzle.id, puzzle.hint, isNormal]); // ✅ 修正点: 依存配列に isNormal を追加
 
   const handleSubmit = () => {
     if (playerInput.toUpperCase() === puzzle.qrData?.toUpperCase()) {
@@ -75,6 +67,7 @@ export default function PuzzleDisplay({
 
   return (
     <div className="puzzle-container">
+      {/* Timer, Log, Progress sections... (省略) */}
       <div className="absolute h-1/15 top-1/30 w-1/10 right-1/30 border rounded-xl border-black flex justify-center items-center text-center">
         <Timer />
       </div>
@@ -123,12 +116,12 @@ export default function PuzzleDisplay({
         <h2 className="puzzle-question absolute top-32 h-2/5 w-28/30 left-1/30 border rounded-3xl border-black text-xl">
           {puzzle.question}
         </h2>
-        {isImageActive && (
-          <img
+        {puzzle.imageUrl && puzzle.imageUrl !== "noimage" && (
+          <Image
             src={puzzle.imageUrl}
-            alt="問題の画像"
+            alt={`問題の画像: ${puzzle.question}`}
             height={500}
-            width="450"
+            width={450}
             className="fixed top-1/5"
           />
         )}
@@ -148,7 +141,6 @@ export default function PuzzleDisplay({
         解答する
       </button>
 
-      {/* QRコード読み取り画面へ遷移するボタン */}
       <button
         onClick={() => router.push(`/qr-reader/${puzzle.id}`)}
         className="absolute h-1/15 top-3/4 w-1/5 left-2/5 border border-black flex justify-center items-center text-center"

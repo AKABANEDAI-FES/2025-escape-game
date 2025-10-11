@@ -66,9 +66,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [gameState.remainingTime, isLoaded, router, gameState.currentChapterId]);
 
-  const setCurrentChapterId = (id: string) => {
+  const setCurrentChapterId = useCallback((id: string) => {
     setGameState((prev) => ({ ...prev, currentChapterId: id }));
-  };
+  }, []);
 
   const resetGame = () => {
     resetGameState();

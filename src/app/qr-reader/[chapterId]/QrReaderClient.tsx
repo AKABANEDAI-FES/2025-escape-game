@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGame } from "@/app/provider/GameProvider";
+import type { Html5Qrcode } from "html5-qrcode"; // 👈 型をインポート
 
 const CONTAINER_ID = "qr-reader";
+const Items: Record<string, string> = {
+    id5: "金の鍵",
+    id6: "銀の鍵",
+    id7: "謎のアイテム",
+  };
 
 function normalizeUrl(u: string) {
   try {
@@ -33,13 +39,8 @@ export default function QrReaderClient({
   const [mounted, setMounted] = useState(false);
   const { setGameState, obtainedItems } = useGame();
 
-  const items: Record<string, string> = {
-    id5: "金の鍵",
-    id6: "銀の鍵",
-    id7: "謎のアイテム",
-  };
 
-  const handleItemScan = (scannedItem: string) => {
+  const handleItemScan = useCallback((scannedItem: string) => {
     setGameState((prev) => {
       if (prev.obtainedItems.includes(scannedItem)) {
         return prev;
@@ -49,10 +50,9 @@ export default function QrReaderClient({
         obtainedItems: [...prev.obtainedItems, scannedItem],
       };
     });
-  };
+  }, [setGameState]);
 
-  // ✅ 新しく追加: 正解時に「解いたパズル」として登録
-  const handlePuzzleSolved = (correctUrl: string) => {
+  const handlePuzzleSolved = useCallback((correctUrl: string) => {
     setGameState((prev) => ({
       ...prev,
       solvedPuzzles: [
@@ -60,7 +60,7 @@ export default function QrReaderClient({
         { id: correctUrl, question: "QR問題", answer: answer },
       ],
     }));
-  };
+  }, [setGameState, answer]);
 
   useEffect(() => setMounted(true), []);
 
@@ -73,17 +73,23 @@ export default function QrReaderClient({
       return;
     }
 
-    let html5QrCode: any | null = null;
+    let html5QrCode: Html5Qrcode | null = null;
     let active = true;
 
-    (async () => {
+(async () => {
       const el = document.getElementById(CONTAINER_ID);
       if (!el) return;
 
       const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import(
         "html5-qrcode"
       );
-      html5QrCode = new Html5Qrcode(CONTAINER_ID, { verbose: false });
+
+      // ▼▼▼ 修正点1: formatsToSupportをここに移動 ▼▼▼
+      html5QrCode = new Html5Qrcode(CONTAINER_ID, {
+        verbose: false,
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+      });
+      // ▲▲▲ ここまで ▲▲▲
 
       const devices = await Html5Qrcode.getCameras();
       if (!active || !devices?.length) {
@@ -100,17 +106,19 @@ export default function QrReaderClient({
             label.includes("environment")
           );
         }) ?? devices[0];
-
+      
+      // ▼▼▼ 修正点2: startメソッドのオプションから削除 ▼▼▼
       await html5QrCode.start(
         back.id,
         {
           fps: 10,
           qrbox: 250,
-          formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+          // formatsToSupport: ...  ← この行を削除
         },
+        // ▲▲▲ ここまで ▲▲▲
         (decodedText: string) => {
           const ok = normalizeUrl(decodedText) === normalizeUrl(correctUrl);
-          const matchedItem = Object.entries(items).find(
+          const matchedItem = Object.entries(Items).find(
             ([id]) => id === decodedText
           );
           const alreadyObtained = matchedItem
@@ -118,7 +126,6 @@ export default function QrReaderClient({
             : false;
 
           if (ok) {
-            // ✅ 正解時：ゲーム進行・状態更新
             setResult("正解です！");
             handlePuzzleSolved(correctUrl); // ← ここで状態更新！
             if (nextChapterId) {
@@ -141,7 +148,6 @@ export default function QrReaderClient({
       console.error(err);
       setResult("カメラの起動に失敗しました");
     });
-
     return () => {
       active = false;
       if (html5QrCode) {
@@ -151,7 +157,7 @@ export default function QrReaderClient({
           .catch(() => {});
       }
     };
-  }, [mounted, correctUrl, router, nextChapterId]);
+  }, [mounted, correctUrl, router, nextChapterId, handleItemScan, obtainedItems, handlePuzzleSolved]);
 
   if (!mounted) return null;
 
