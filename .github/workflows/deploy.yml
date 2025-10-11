@@ -1,8 +1,13 @@
-name: Deploy Next.js site to GitHub Pages
+name: Check & Deploy Next.js App
 
 on:
+  # mainブランチにプッシュされた時に実行
   push:
     branches: ["main"]
+  # mainブランチへのプルリクエスト作成・更新時に実行
+  pull_request:
+    branches: ["main"]
+  # Actionsタブから手動でも実行可能
   workflow_dispatch:
 
 permissions:
@@ -19,47 +24,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-          run_install: false
+      # GitHub Pagesの設定を読み込み、base_pathなどを準備します
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
 
+      # Node.jsとnpmの環境をセットアップします
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "pnpm"
-
-      - name: Setup Pages
-        id: setup-pages
-        uses: actions/configure-pages@v5
-
-      - name: Restore cache
-        uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+          node-version: "20" # Node.jsのバージョン
+          cache: "npm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
+      # Next.jsアプリをビルドします
       - name: Build with Next.js
-        run: pnpm run build
+        # ここで環境変数 BASE_PATH にリポジトリ名が自動で設定されます
         env:
-          BASE_PATH: ${{ steps.setup-pages.outputs.base_path }} # ← GitHub Pagesのサブパスが自動注入される
-          ROBOTS: "noindex, nofollow"
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: npm run build
 
+      # ビルドされた成果物 (outフォルダ) をアップロードします
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out # ← next exportの出力先
+          path: ./out
 
   deploy:
+    # このジョブは、mainブランチへのpushの時だけ実行されます
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
