@@ -7,6 +7,7 @@ import Timer from "./Timer";
 import { useRouter } from "next/navigation";
 import LogPage from "@/app/log/log";
 import ProgressPage from "@/app/progress/progress";
+import Image from "next/image";
 
 interface PuzzleDisplayProps {
   puzzle: PuzzleChapter;
@@ -23,11 +24,6 @@ export default function PuzzleDisplay({
   const [errorMessage, setErrorMessage] = useState("");
   const [hintMessage, setHintMessage] = useState("");
 
-  // 現在のチャプターにimageがあるかどうかを判定
-  const isImageActive = puzzle.imageUrl !== "noimage";
-  // ---- ヒント用タイマー ----
-  const [hintCountdown, setHintCountdown] = useState(10);
-
   useEffect(() => {
     resumeTimer();
     return () => {
@@ -35,20 +31,15 @@ export default function PuzzleDisplay({
     };
   }, [pauseTimer, resumeTimer]);
 
-  // ヒント用タイマー
   useEffect(() => {
-    const timer = setInterval(() => {
-      setHintCountdown((prev) => {
-        if (prev <= 1) {
-          setHintMessage(puzzle.hint[0]);
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [puzzle.hint]);
+    const hintTimer = setTimeout(() => {
+      if (puzzle.hint && puzzle.hint.length > 0) {
+        setHintMessage(puzzle.hint[0]);
+      }
+    }, 10000);
+
+    return () => clearTimeout(hintTimer);
+  }, [puzzle.id, puzzle.hint]);
 
   const handleSubmit = () => {
     if (playerInput.toUpperCase() === puzzle.qrData?.toUpperCase()) {
@@ -117,15 +108,17 @@ export default function PuzzleDisplay({
         <h2 className="puzzle-question absolute top-32 h-2/5 w-28/30 left-1/30 border rounded-3xl border-black text-xl">
           {puzzle.question}
         </h2>
-        {isImageActive && (
-          <img
-            src={puzzle.imageUrl}
-            alt="問題の画像"
+        
+        {puzzle.imageUrl && puzzle.imageUrl !== "noimage" && (
+          <Image
+            src={puzzle.imageUrl} 
+            alt={`問題の画像: ${puzzle.question}`}
             height={500}
-            width="450"
+            width={450}
             className="fixed top-1/5"
           />
         )}
+
       </div>
       <input
         type="text"
