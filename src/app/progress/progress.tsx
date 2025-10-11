@@ -11,11 +11,20 @@ export default function ProgressPage() {
 
   const router = useRouter();
   // `useGame`からタイマー関連のstateと現在のチャプターIDを取得
-  const { solvedPuzzles, currentChapterId, remainingTime, pauseTimer, resumeTimer } = useGame();
+  const { obtainedItems, solvedPuzzles, currentChapterId, remainingTime, pauseTimer, resumeTimer } = useGame();
 
   
   // 現在のチャプターがパズルかどうかを判定
   const isPuzzleActive = gameData[currentChapterId]?.type === 'puzzle';
+
+  //  お札を solvedPuzzles から生成
+  const obtainedOfudaItems = solvedPuzzles.map(
+  (puzzle) => `お札 ${puzzle.id.slice(-1)}`
+  );
+  const otherItems = obtainedItems.filter((item) => !item.startsWith('お札'));
+  const allOfudaItems = Array.from(new Set(obtainedOfudaItems));
+  const uniqueOtherItems = Array.from(new Set(otherItems));
+
 
   // このページが表示されている間タイマーを再開し、離れるときに一時停止する
   useEffect(() => {
@@ -69,6 +78,37 @@ export default function ProgressPage() {
             </div>
           )}
         </main>
+
+        <section className="my-5 space-y-6 bg-white p-6 rounded-lg shadow-inner border-black border">
+          <div className="border-b border-gray-700 pb-4 last:border-b-0">
+            <h2 className="text-xl font-semibold text-black mb-2">入手アイテム一覧</h2>
+            {allOfudaItems.length === 0 ? (
+              <p></p>
+            ) : (
+              <ul className="flex gap-5 text-black whitespace-pre-wrap leading-relaxed">
+                {allOfudaItems.map((name, index) => (
+                  <li key={`ofuda-${index}`} className="text-lg">
+                  {name}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {uniqueOtherItems.length === 0 ? (
+              <p></p>
+            ) : (
+              <ul className="flex gap-5 text-black whitespace-pre-wrap leading-relaxed">
+              {uniqueOtherItems.map((name, index) => (
+                <li key={`item-${index}`} className="text-lg">
+                  {name}
+                  <div className="text-md text-gray-500">
+                  このアイテムは謎解きに一切関係ありません
+                  </div>
+                </li>
+              ))}
+              </ul>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );
