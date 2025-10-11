@@ -45,7 +45,7 @@ export default function PuzzleDisplay({
             setHintMessage(puzzle.hint[0]);
           }
           else {
-            setHintMessage(puzzle.hint.join());
+            setHintMessage(puzzle.hint.join("\n"));
           }
           clearInterval(timer);
           return 0;
@@ -190,7 +190,7 @@ export default function PuzzleDisplay({
               ×
             </label>
             <div className="content p-3 text-center">
-              <p className="text-2xl">{hintMessage}</p>
+              <p className="text-2xl whitespace-pre-line">{hintMessage}</p>
             </div>
           </div>
         </>
