@@ -116,7 +116,7 @@ export const gameData:Record<string, GameChapter> ={
     type: 'puzzle',
     puzzleType: 'QR_SCAN',
     question: "壁に投影された最後の謎だ。脱出のキーワードを入力せよ。",
-    answer: "test",
+    answer: "https://akabanedai-fes.com/",
     nextChapterId: 'action-final-projector',
     hint: "ヒント: 部屋の中央に注目してみろ。",
   },
