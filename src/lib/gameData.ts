@@ -140,19 +140,14 @@ export const gameData: Record<string, GameChapter> = {
   'puzzle-5': {
     id: 'puzzle-5',
     type: 'puzzle',
-    puzzleType: 'TEXT_INPUT', // 問題文に合わせて修正
-    question: "壁に投影された最後の謎だ。脱出のキーワードを入力せよ。",
-    answer: "https://akabanedai-fes.com/",
-    nextChapterId: "action-final-projector",
+    puzzleType: 'QR_SCAN', // 問題文に合わせて修正
+    question: "最後の問題４枚のお札を組み合わせろ",
+    qrData: "id=004",
+    answer: "５の答え",
+    nextChapterId: "success-story",
     hint: ["ヒント: 部屋の中央に注目してみろ。", "ヒント２:テキストテキスト"],
   },
-  "action-final-projector": {
-    id: "action3",
-    type: "action",
-    actionType: "PROJECTOR_CHANGE",
-    message: "脱出シーケンスを開始...",
-    nextChapterId: "success-story",
-  },
+
   "success-story": {
     id: "clear",
     type: "story",
