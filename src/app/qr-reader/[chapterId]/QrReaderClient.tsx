@@ -1,38 +1,68 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Timer from '@/components/game/Timer'; // ✅ 追加：Timerコンポーネントをインポート
-import { useGame } from '@/app/provider/GameProvider'; // ✅ タイマーの状態共有にも必要
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Timer from '@/components/game/Timer';
+import { useGame } from "@/app/provider/GameProvider";
+import type { Html5Qrcode } from "html5-qrcode"; // 👈 型をインポート
 
-const CONTAINER_ID = 'qr-reader';
+const CONTAINER_ID = "qr-reader";
+const Items: Record<string, string> = {
+    id5: "金の鍵",
+    id6: "銀の鍵",
+    id7: "謎のアイテム",
+  };
 
 function normalizeUrl(u: string) {
   try {
     const t = u.trim();
-    if (!t) return '';
+    if (!t) return "";
     const url = new URL(t);
-    url.pathname = url.pathname.replace(/\/+$/, '');
+    url.pathname = url.pathname.replace(/\/+$/, "");
     return url.toString().toLowerCase();
   } catch {
-    return u.trim().replace(/\/+$/, '').toLowerCase();
+    return u.trim().replace(/\/+$/, "").toLowerCase();
   }
 }
 
 export default function QrReaderClient({
-  chapterId,
   correctUrl,
-  nextChapterId,
+  nextChapterId,  
+  answer
 }: {
   chapterId: string;
   correctUrl: string;
   nextChapterId: string | null;
+  answer: string;
 }) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const { pauseTimer, resumeTimer } = useGame();
+  const { setGameState, obtainedItems } = useGame();
+
+  const handleItemScan = useCallback((scannedItem: string) => {
+    setGameState((prev) => {
+      if (prev.obtainedItems.includes(scannedItem)) {
+        return prev;
+      }
+      return {
+        ...prev,
+        obtainedItems: [...prev.obtainedItems, scannedItem],
+      };
+    });
+  }, [setGameState]);
+
+  const handlePuzzleSolved = useCallback((correctUrl: string) => {
+    setGameState((prev) => ({
+      ...prev,
+      solvedPuzzles: [
+        ...prev.solvedPuzzles,
+        { id: correctUrl, question: "QR問題", answer: answer },
+      ],
+    }));
+  }, [setGameState, answer]);
 
   useEffect(() => {
     setMounted(true);
@@ -42,62 +72,97 @@ export default function QrReaderClient({
   useEffect(() => {
     if (!mounted) return;
     if (!correctUrl) {
-      setResult('このチャプターはQRスキャンではないか、正解URLが設定されていません。');
+      setResult(
+        "このチャプターはQRスキャンではないか、正解URLが設定されていません。"
+      );
       return;
     }
 
-    let html5QrCode: any | null = null;
+    let html5QrCode: Html5Qrcode | null = null;
     let active = true;
 
-    (async () => {
+(async () => {
       const el = document.getElementById(CONTAINER_ID);
       if (!el) return;
 
-      const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import('html5-qrcode');
-      html5QrCode = new Html5Qrcode(CONTAINER_ID, { verbose: false });
+      const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import(
+        "html5-qrcode"
+      );
+
+      // ▼▼▼ 修正点1: formatsToSupportをここに移動 ▼▼▼
+      html5QrCode = new Html5Qrcode(CONTAINER_ID, {
+        verbose: false,
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+      });
+      // ▲▲▲ ここまで ▲▲▲
 
       const devices = await Html5Qrcode.getCameras();
       if (!active || !devices?.length) {
-        setResult('カメラが見つかりませんでした');
+        setResult("カメラが見つかりませんでした");
         return;
       }
 
       const back =
         devices.find((d) => {
-          const label = (d.label || '').toLowerCase();
-          return label.includes('back') || label.includes('rear') || label.includes('environment');
+          const label = (d.label || "").toLowerCase();
+          return (
+            label.includes("back") ||
+            label.includes("rear") ||
+            label.includes("environment")
+          );
         }) ?? devices[0];
-
+      
+      // ▼▼▼ 修正点2: startメソッドのオプションから削除 ▼▼▼
       await html5QrCode.start(
         back.id,
         {
           fps: 10,
           qrbox: 250,
-          formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+          // formatsToSupport: ...  ← この行を削除
         },
+        // ▲▲▲ ここまで ▲▲▲
         (decodedText: string) => {
           const ok = normalizeUrl(decodedText) === normalizeUrl(correctUrl);
+          const matchedItem = Object.entries(Items).find(
+            ([id]) => id === decodedText
+          );
+          const alreadyObtained = matchedItem
+            ? obtainedItems.includes(matchedItem[1])
+            : false;
+
           if (ok) {
-            pauseTimer();
-            setShowPopup(true);
+            handlePuzzleSolved(correctUrl); // ← ここで状態更新！
+            if (nextChapterId) {
+              pauseTimer();
+              setShowPopup(true);
+            } else {
+              router.push("/success");
+            }
+          } else if (alreadyObtained) {
+            setResult("このアイテムは既に取得済みです");
+          } else if (matchedItem) {
+            setResult(`${matchedItem[1]}を取得しました`);
+            handleItemScan(matchedItem[1]);
           } else {
-            setResult('違うみたい…');
+            setResult("違うみたい…");
           }
         },
         () => {}
       );
     })().catch((err) => {
       console.error(err);
-      setResult('カメラの起動に失敗しました');
+      setResult("カメラの起動に失敗しました");
     });
-
     return () => {
       active = false;
       if (html5QrCode) {
-        html5QrCode.stop().then(() => html5QrCode?.clear()).catch(() => {});
+        html5QrCode
+          .stop()
+          .then(() => html5QrCode?.clear())
+          .catch(() => {});
       }
     };
-  }, [mounted, correctUrl, router, nextChapterId]);
+  }, [mounted, correctUrl, router, nextChapterId, handleItemScan, obtainedItems, handlePuzzleSolved]);
 
   const handleNext = () => {
     if (nextChapterId) {

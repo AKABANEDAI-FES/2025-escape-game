@@ -6,23 +6,25 @@ import { useGame } from "@/app/provider/GameProvider";
 import Timer from "./Timer";
 import { useRouter } from "next/navigation";
 import LogPage from "@/app/log/log";
-import ProgressPage from "@/app/progress/progress"
+import ProgressPage from "@/app/progress/progress";
+import Image from "next/image";
 
 interface PuzzleDisplayProps {
   puzzle: PuzzleChapter;
   onSolved: () => void;
 }
 
-export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) {
-  const { pauseTimer, resumeTimer, setGameState } = useGame();
+export default function PuzzleDisplay({
+  puzzle,
+  onSolved,
+}: PuzzleDisplayProps) {
+  const { pauseTimer, resumeTimer, setGameState, difficulty } = useGame();
   const router = useRouter();
-
   const [playerInput, setPlayerInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [hintMessage, setHintMessage] = useState("");
 
-  // ---- ヒント用タイマー ----
-  const [hintCountdown, setHintCountdown] = useState(10); 
+  const isNormal = difficulty === "normal";
 
   useEffect(() => {
     resumeTimer();
@@ -31,21 +33,23 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
     };
   }, [pauseTimer, resumeTimer]);
 
-  // ヒント用タイマー
+  // ヒント表示のロジック
   useEffect(() => {
-    if (hintCountdown <= 0) {
-      setHintMessage(puzzle.hint); // カウント0になったらヒント表示
-      return;
-    }
-    const timer = setInterval(() => {
-      setHintCountdown((prev) => prev - 1);
-    }, 1000);
+    // 10秒後にヒントを表示するタイマー
+    const hintTimer = setTimeout(() => {
+      if (puzzle.hint && puzzle.hint.length > 0) {
+        // 難易度に応じて表示するヒントの内容を決定
+        const message = isNormal ? puzzle.hint[0] : puzzle.hint.join("\n");
+        setHintMessage(message);
+      }
+    }, 10000); // 10秒
 
-    return () => clearInterval(timer);
-  }, [hintCountdown, puzzle.hint]);
+    // コンポーネントが再描画、またはアンマウントされる際にタイマーをクリア
+    return () => clearTimeout(hintTimer);
+  }, [puzzle.id, puzzle.hint, isNormal]); // ✅ 修正点: 依存配列に isNormal を追加
 
   const handleSubmit = () => {
-    if (playerInput.toUpperCase() === puzzle.answer.toUpperCase()) {
+    if (playerInput.toUpperCase() === puzzle.qrData?.toUpperCase()) {
       setErrorMessage("");
       setHintMessage("");
       setGameState((prev) => ({
@@ -63,31 +67,19 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
 
   return (
     <div className="puzzle-container">
+      {/* Timer, Log, Progress sections... (省略) */}
       <div className="absolute h-1/15 top-1/30 w-1/10 right-1/30 border rounded-xl border-black flex justify-center items-center text-center">
         <Timer />
       </div>
-      <input
-            type="checkbox"
-            className="peer/log-flag hidden"
-            id="log"
-          />
+      <input type="checkbox" className="peer/log-flag hidden" id="log" />
       <label
         className="button-sample1 absolute h-1/15 w-1/5  border border-black flex justify-center items-center text-center"
         htmlFor="log"
       >
         会話を見る
       </label>
-      <div
-            className="popup fixed inset-0 hidden peer-checked/log-flag:block z-50"
-            // style={{ left: "calc(50vw - calc(calc(8 / 12 * 100%) / 2))" }}
-          >
+      <div className="popup fixed inset-0 hidden peer-checked/log-flag:block z-50">
         <LogPage />
-        {/* <button
-            onClick={() => router.back()}
-            className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
-          >
-            ゲームに戻る
-          </button> */}
         <label
           className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
           htmlFor="log"
@@ -96,35 +88,21 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
           ゲームに戻る
         </label>
       </div>
-      {/* <button
-        onClick={() => router.push("/log")}
-        className="absolute h-1/15 w-1/5  border border-black flex justify-center items-center text-center"
-      >
-        会話を見る
-      </button> */}
 
       <input
-            type="checkbox"
-            className="peer/progress-flag hidden"
-            id="progress"
-          />
+        type="checkbox"
+        className="peer/progress-flag hidden"
+        id="progress"
+      />
       <label
         className="button-sample2 absolute h-1/15 w-1/5 left-7/30 border border-black flex justify-center items-center text-center"
         htmlFor="progress"
       >
         進捗を見る
       </label>
-      <div
-            className="popup fixed inset-0 hidden peer-checked/progress-flag:block z-50"
-            // style={{ left: "calc(50vw - calc(calc(8 / 12 * 100%) / 2))" }}
-          >
+      <div className="popup fixed inset-0 hidden peer-checked/progress-flag:block z-50">
         <ProgressPage />
-        {/* <button
-            onClick={() => router.back()}
-            className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
-          >
-            ゲームに戻る
-          </button> */}
+
         <label
           className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
           htmlFor="progress"
@@ -133,16 +111,21 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
           ゲームに戻る
         </label>
       </div>
-      {/* <button
-        onClick={() => router.push("/progress")}
-        className="absolute h-1/15 w-1/5  border border-black flex justify-center items-center text-center"
-      >
-        進捗を見る
-      </button> */}
 
-      <h2 className="puzzle-question absolute top-32 h-1/3 w-28/30 left-1/30 border rounded-3xl border-black flex justify-center items-center text-center text-xl">
-        {puzzle.question}
-      </h2>
+      <div className="flex justify-center items-center text-center">
+        <h2 className="puzzle-question absolute top-32 h-2/5 w-28/30 left-1/30 border rounded-3xl border-black text-xl">
+          {puzzle.question}
+        </h2>
+        {puzzle.imageUrl && puzzle.imageUrl !== "noimage" && (
+          <Image
+            src={puzzle.imageUrl}
+            alt={`問題の画像: ${puzzle.question}`}
+            height={500}
+            width={450}
+            className="fixed top-1/5"
+          />
+        )}
+      </div>
       <input
         type="text"
         value={playerInput}
@@ -158,7 +141,6 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
         解答する
       </button>
 
-      {/* QRコード読み取り画面へ遷移するボタン */}
       <button
         onClick={() => router.push(`/qr-reader/${puzzle.id}`)}
         className="absolute h-1/15 top-3/4 w-1/5 left-2/5 border border-black flex justify-center items-center text-center"
@@ -200,7 +182,7 @@ export default function PuzzleDisplay({ puzzle, onSolved }: PuzzleDisplayProps) 
               ×
             </label>
             <div className="content p-3 text-center">
-              <p className="text-2xl">{hintMessage}</p>
+              <p className="text-2xl whitespace-pre-line">{hintMessage}</p>
             </div>
           </div>
         </>

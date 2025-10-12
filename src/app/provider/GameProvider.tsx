@@ -16,6 +16,8 @@ interface GameContextType {
   setCurrentChapterId: (id: string) => void;
   solvedPuzzles: SolvedPuzzle[];
   viewedStoryChapters: string[];
+  difficulty: "easy" | "normal";
+  obtainedItems: string[];
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -64,9 +66,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [gameState.remainingTime, isLoaded, router, gameState.currentChapterId]);
 
-  const setCurrentChapterId = (id: string) => {
+  const setCurrentChapterId = useCallback((id: string) => {
     setGameState((prev) => ({ ...prev, currentChapterId: id }));
-  };
+  }, []);
 
   const resetGame = () => {
     resetGameState();
