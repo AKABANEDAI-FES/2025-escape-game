@@ -19,7 +19,6 @@ export interface PuzzleChapter {
   imageUrl?: string;
   hint: string[]; // 型定義を string[] に合わせる
   nextChapterId: string;
-  timeLimit: number; // 個別タイマー用のプロパティ
 }
 
 export interface ActionChapter {
@@ -61,11 +60,10 @@ export const gameData: Record<string, GameChapter> = {
     answer: `黒猫=9匹　灰色猫=6匹　三毛猫=5匹
 　カレンダーから　965=ちょう
 　⇒蝶の絵の裏`,
-    qrData: "https://akabanedai-fes.com/", // QRスキャン時の正解はqrDataで判定
+    qrData: "id=001", // QRスキャン時の正解はqrDataで判定
     imageUrl: `${basePath}/image/question/question1.png`,
     nextChapterId: "puzzle-2",
-    hint: ["ヒント: 部屋の中央をよく見てみろ。", "ヒント２"],
-    timeLimit: 180, // 例: 3分
+    hint: ["ヒント: 部屋の中央をよく見てみろ。", "ヒント２:テキストテキスト"],
   },
   "puzzle-2": {
     id: "puzzle-2",
@@ -75,11 +73,10 @@ export const gameData: Record<string, GameChapter> = {
     answer: `❤︎♠︎♠︎♦︎=book
 　本のページを鏡に映すとドクロ
 　⇒ドクロの中`,
-    qrData: "id2",
+    qrData: "id=002",
     imageUrl: `${basePath}/image/question/question2.png`,
-    hint: ["ヒント: 部屋の隅に注意してみろ。", "ヒント２"],
+    hint: ["ヒント: 部屋の隅に注意してみろ。", "ヒント２:テキストテキスト"],
     nextChapterId: "puzzle-3",
-    timeLimit: 180,
   },
   "puzzle-3": {
     id: "puzzle-3",
@@ -90,11 +87,10 @@ export const gameData: Record<string, GameChapter> = {
 　*未定*
 　*未定*
 　⇒スタッフが持っている`,
-    qrData: "id3",
+    qrData: "id=003",
     imageUrl: `${basePath}/image/question/question3.png`,
-    hint: ["ヒント: 高い場所を探せ。", "ヒント２"],
+    hint: ["ヒント: 高い場所を探せ。", "ヒント２:テキストテキスト"],
     nextChapterId: "door-open-story",
-    timeLimit: 180,
   },
   "door-open-story": {
     id: "chapter2-1",
@@ -126,8 +122,7 @@ export const gameData: Record<string, GameChapter> = {
     answer: "test", // TEXT_INPUT時の正解はanswerで判定
     // "noimage"を削除
     nextChapterId: "projector-start-story",
-    hint: ["ヒント: 部屋の壁に注目してみろ。", "ヒント２"],
-    timeLimit: 240,
+    hint: ["ヒント: 部屋の壁に注目してみろ。", "ヒント２:テキストテキスト"],
   },
   "projector-start-story": {
     id: "chapter3",
@@ -149,8 +144,7 @@ export const gameData: Record<string, GameChapter> = {
     question: "壁に投影された最後の謎だ。脱出のキーワードを入力せよ。",
     answer: "https://akabanedai-fes.com/",
     nextChapterId: "action-final-projector",
-    hint: ["ヒント: 部屋の中央に注目してみろ。", "ヒント２"],
-    timeLimit: 300,
+    hint: ["ヒント: 部屋の中央に注目してみろ。", "ヒント２:テキストテキスト"],
   },
   "action-final-projector": {
     id: "action3",

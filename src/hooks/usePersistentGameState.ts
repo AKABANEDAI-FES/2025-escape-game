@@ -11,6 +11,7 @@ export interface GameState {
   isTimerPaused:boolean;
   difficulty: "easy" | "normal";
   obtainedItems: string[];
+  hintStartTimes: Record<string, number>;
 }
 export interface SolvedPuzzle {
   id: string;
@@ -26,6 +27,7 @@ const initialGameState: GameState = {
   isTimerPaused: false,
   difficulty: "easy",
   obtainedItems: [],
+  hintStartTimes: {},
 };
 
 export function usePersistentGameState() {

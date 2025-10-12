@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import LogPage from "@/app/log/log";
 import ProgressPage from "@/app/progress/progress";
 import Image from "next/image";
+import { usePersistentGameState } from "@/hooks/usePersistentGameState";
 
 interface PuzzleDisplayProps {
   puzzle: PuzzleChapter;
@@ -18,7 +19,9 @@ export default function PuzzleDisplay({
   puzzle,
   onSolved,
 }: PuzzleDisplayProps) {
-  const { pauseTimer, resumeTimer, setGameState, difficulty } = useGame();
+  const { pauseTimer, resumeTimer, setGameState, difficulty, startHintTimer } =
+    useGame();
+  const { gameState } = usePersistentGameState();
   const router = useRouter();
   const [playerInput, setPlayerInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -33,20 +36,29 @@ export default function PuzzleDisplay({
     };
   }, [pauseTimer, resumeTimer]);
 
-  // ヒント表示のロジック
   useEffect(() => {
-    // 10秒後にヒントを表示するタイマー
-    const hintTimer = setTimeout(() => {
-      if (puzzle.hint && puzzle.hint.length > 0) {
-        // 難易度に応じて表示するヒントの内容を決定
+    if (!puzzle.hint || puzzle.hint.length === 0) return;
+
+    // ヒントタイマーを開始（初回のみ）
+    if (!gameState.hintStartTimes[puzzle.id]) {
+      startHintTimer(puzzle.id);
+    }
+
+    const startTime = gameState.hintStartTimes[puzzle.id] ?? Date.now();
+    const elapsed = Date.now() - startTime;
+    const remaining = 10000 - elapsed; // 10秒でヒント表示
+
+    if (remaining <= 0) {
+      const message = isNormal ? puzzle.hint[0] : puzzle.hint.join("\n");
+      setHintMessage(message);
+    } else {
+      const timer = setTimeout(() => {
         const message = isNormal ? puzzle.hint[0] : puzzle.hint.join("\n");
         setHintMessage(message);
-      }
-    }, 10000); // 10秒
-
-    // コンポーネントが再描画、またはアンマウントされる際にタイマーをクリア
-    return () => clearTimeout(hintTimer);
-  }, [puzzle.id, puzzle.hint, isNormal]); // ✅ 修正点: 依存配列に isNormal を追加
+      }, remaining);
+      return () => clearTimeout(timer);
+    }
+  }, [puzzle.id, puzzle.hint, isNormal, gameState.hintStartTimes]);
 
   const handleSubmit = () => {
     if (playerInput.toUpperCase() === puzzle.qrData?.toUpperCase()) {

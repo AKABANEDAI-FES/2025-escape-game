@@ -18,6 +18,7 @@ interface GameContextType {
   viewedStoryChapters: string[];
   difficulty: "easy" | "normal";
   obtainedItems: string[];
+  startHintTimer: (chapterId: string) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -58,6 +59,16 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     return ()=>clearInterval(timerRef.current!);
   }, [ gameState.isTimerPaused,isLoaded, runTimer]);
 
+  const startHintTimer = useCallback((chapterId: string) => {
+    setGameState((prev) => ({
+      ...prev,
+      hintStartTimes: {
+        ...prev.hintStartTimes,
+        [chapterId]: Date.now(),
+      },
+    }));
+  }, [setGameState]);
+
   useEffect(()=>{
     if(isLoaded && gameState.remainingTime <=0){
       if (gameState.currentChapterId !== "failure") {
@@ -86,6 +97,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         resetGame,
         setGameState,
         setCurrentChapterId,
+        startHintTimer,
       }}
     >
       {children}
