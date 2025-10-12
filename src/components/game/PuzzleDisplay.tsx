@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import LogPage from "@/app/log/log";
 import ProgressPage from "@/app/progress/progress";
 import Image from "next/image";
+import { usePersistentGameState } from "@/hooks/usePersistentGameState";
 
 interface PuzzleDisplayProps {
   puzzle: PuzzleChapter;
@@ -18,7 +19,9 @@ export default function PuzzleDisplay({
   puzzle,
   onSolved,
 }: PuzzleDisplayProps) {
-  const { pauseTimer, resumeTimer, setGameState, difficulty } = useGame();
+  const { pauseTimer, resumeTimer, setGameState, difficulty, startHintTimer } =
+    useGame();
+  const { gameState } = usePersistentGameState();
   const router = useRouter();
   const [playerInput, setPlayerInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -33,23 +36,29 @@ export default function PuzzleDisplay({
     };
   }, [pauseTimer, resumeTimer]);
 
-  // ヒント表示のロジック
   useEffect(() => {
-    // 10秒後にヒントを表示するタイマー
-    const hintTimer = setTimeout(() => {
-      if (puzzle.hint && puzzle.hint.length > 0) {
-        // 難易度に応じて表示するヒントの内容を決定
+    if (!puzzle.hint || puzzle.hint.length === 0) return;
+    if (!gameState.hintStartTimes[puzzle.id]) {
+      startHintTimer(puzzle.id);
+    }
+    const startTime = gameState.hintStartTimes[puzzle.id] ?? Date.now();
+    const elapsed = Date.now() - startTime;
+    const remaining = 10000 - elapsed;
+    if (remaining <= 0) {
+      const message = isNormal ? puzzle.hint[0] : puzzle.hint.join("\n");
+      setHintMessage(message);
+    } else {
+      const timer = setTimeout(() => {
         const message = isNormal ? puzzle.hint[0] : puzzle.hint.join("\n");
         setHintMessage(message);
-      }
-    }, 10000); // 10秒
-
-    // コンポーネントが再描画、またはアンマウントされる際にタイマーをクリア
-    return () => clearTimeout(hintTimer);
-  }, [puzzle.id, puzzle.hint, isNormal]); // ✅ 修正点: 依存配列に isNormal を追加
+      }, remaining);
+      return () => clearTimeout(timer);
+    }
+  }, [puzzle.id, puzzle.hint, isNormal, gameState.hintStartTimes]);
 
   const handleSubmit = () => {
-    if (playerInput.toUpperCase() === puzzle.qrData?.toUpperCase()) {
+    if (!puzzle.answer) return;
+    if (playerInput.toUpperCase() === puzzle.answer.toUpperCase()) {
       setErrorMessage("");
       setHintMessage("");
       setGameState((prev) => ({
@@ -88,7 +97,6 @@ export default function PuzzleDisplay({
           ゲームに戻る
         </label>
       </div>
-
       <input
         type="checkbox"
         className="peer/progress-flag hidden"
@@ -102,7 +110,6 @@ export default function PuzzleDisplay({
       </label>
       <div className="popup fixed inset-0 hidden peer-checked/progress-flag:block z-50">
         <ProgressPage />
-
         <label
           className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
           htmlFor="progress"
@@ -111,7 +118,6 @@ export default function PuzzleDisplay({
           ゲームに戻る
         </label>
       </div>
-
       <div className="flex justify-center items-center text-center">
         <h2 className="puzzle-question absolute top-32 h-2/5 w-28/30 left-1/30 border rounded-3xl border-black text-xl">
           {puzzle.question}
@@ -126,29 +132,41 @@ export default function PuzzleDisplay({
           />
         )}
       </div>
-      <input
-        type="text"
-        value={playerInput}
-        onChange={(e) => setPlayerInput(e.target.value)}
-        placeholder="答えを入力"
-        className="absolute left-1/2"
-      />
 
-      <button
-        onClick={handleSubmit}
-        className="absolute h-1/15 top-2/3 w-1/5 left-2/5 border border-black flex justify-center items-center text-center"
-      >
-        解答する
-      </button>
+      {/* ▼▼▼ ここから変更 ▼▼▼ */}
 
-      <button
-        onClick={() => router.push(`/qr-reader/${puzzle.id}`)}
-        className="absolute h-1/15 top-3/4 w-1/5 left-2/5 border border-black flex justify-center items-center text-center"
-      >
-        QRコードを読み込む
-      </button>
+      {/* テキスト入力型の問題の場合 */}
+      {puzzle.puzzleType === "TEXT_INPUT" && (
+        <div className="absolute top-2/3 left-1/2 -translate-x-1/2 w-full flex flex-col items-center gap-4">
+          <input
+            type="text"
+            value={playerInput}
+            onChange={(e) => setPlayerInput(e.target.value)}
+            placeholder="答えを入力"
+            className="w-1/2 p-2 border border-black text-center"
+          />
+          <button
+            onClick={handleSubmit}
+            className="h-12 w-1/5 border border-black flex justify-center items-center text-center"
+          >
+            解答する
+          </button>
+        </div>
+      )}
 
-      {/* ヒント表示 */}
+      {/* QRコード読み込み型の問題の場合 */}
+      {puzzle.puzzleType === "QR_SCAN" && (
+        <button
+          onClick={() => router.push(`/qr-reader/${puzzle.id}`)}
+          className="absolute h-1/15 top-3/4 w-1/5 left-1/2 -translate-x-1/2 border border-black flex justify-center items-center text-center"
+        >
+          QRコードを読み込む
+        </button>
+      )}
+
+      {/* ▲▲▲ ここまで変更 ▲▲▲ */}
+
+      {/* ヒント表示 (変更なし) */}
       <div className="button-container">
         {hintMessage && (
           <label
@@ -187,8 +205,7 @@ export default function PuzzleDisplay({
           </div>
         </>
       )}
-
-      {errorMessage && <p>{errorMessage}</p>}
+      {errorMessage && <p className="text-red-500 absolute bottom-1/4 left-1/2 -translate-x-1/2">{errorMessage}</p>}
     </div>
   );
 }
