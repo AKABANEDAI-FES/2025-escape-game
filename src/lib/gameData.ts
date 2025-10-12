@@ -61,7 +61,7 @@ export const gameData: Record<string, GameChapter> = {
     answer: `黒猫=9匹　灰色猫=6匹　三毛猫=5匹
 　カレンダーから　965=ちょう
 　⇒蝶の絵の裏`,
-    qrData: "id1", // QRスキャン時の正解はqrDataで判定
+    qrData: "https://akabanedai-fes.com/", // QRスキャン時の正解はqrDataで判定
     imageUrl: `${basePath}/image/question/question1.png`,
     nextChapterId: "puzzle-2",
     hint: ["ヒント: 部屋の中央をよく見てみろ。", "ヒント２"],
@@ -147,7 +147,7 @@ export const gameData: Record<string, GameChapter> = {
     type: 'puzzle',
     puzzleType: 'TEXT_INPUT', // 問題文に合わせて修正
     question: "壁に投影された最後の謎だ。脱出のキーワードを入力せよ。",
-    answer: "test",
+    answer: "https://akabanedai-fes.com/",
     nextChapterId: "action-final-projector",
     hint: ["ヒント: 部屋の中央に注目してみろ。", "ヒント２"],
     timeLimit: 300,

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Timer from '@/components/game/Timer';
 import { useGame } from "@/app/provider/GameProvider";
 import type { Html5Qrcode } from "html5-qrcode"; // 👈 型をインポート
 
@@ -35,10 +36,11 @@ export default function QrReaderClient({
   answer: string;
 }) {
   const router = useRouter();
-  const [result, setResult] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const { pauseTimer, resumeTimer } = useGame();
   const { setGameState, obtainedItems } = useGame();
-
 
   const handleItemScan = useCallback((scannedItem: string) => {
     setGameState((prev) => {
@@ -62,7 +64,10 @@ export default function QrReaderClient({
     }));
   }, [setGameState, answer]);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    resumeTimer(); // ✅ QR画面でタイマーを動かす
+  }, [resumeTimer]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -126,10 +131,10 @@ export default function QrReaderClient({
             : false;
 
           if (ok) {
-            setResult("正解です！");
             handlePuzzleSolved(correctUrl); // ← ここで状態更新！
             if (nextChapterId) {
-              router.push(`/game/${nextChapterId}`);
+              pauseTimer();
+              setShowPopup(true);
             } else {
               router.push("/success");
             }
@@ -159,16 +164,76 @@ export default function QrReaderClient({
     };
   }, [mounted, correctUrl, router, nextChapterId, handleItemScan, obtainedItems, handlePuzzleSolved]);
 
-  if (!mounted) return null;
+  const handleNext = () => {
+    if (nextChapterId) {
+      router.push(`/game/${nextChapterId}`);
+    } else {
+      router.push('/success');
+    }
+  };
+
+  if (!mounted) {
+    return <div style={{ textAlign: 'center', padding: '20px' }}>読み込み中...</div>;
+  }
 
   return (
-    <div>
+    <div style={{ textAlign: 'center' }}>
       <h1>QRコード読み取り</h1>
-      <div id={CONTAINER_ID} style={{ width: 320, height: 320 }} />
+
+      {/* ✅ タイマーをここに表示 */}
+      <div style={{ fontSize: '1.5rem', marginBottom: '12px' }}>
+        <Timer />
+      </div>
+
+      <div id={CONTAINER_ID} style={{ width: 320, height: 320, margin: '0 auto' }} />
       {result && <h2 style={{ marginTop: 12 }}>{result}</h2>}
       <button onClick={() => router.back()} style={{ marginTop: 16 }}>
         戻る
       </button>
+
+      {/* ✅ 正解ポップアップ */}
+      {showPopup && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: 'white',
+              padding: '24px 32px',
+              borderRadius: '12px',
+              textAlign: 'center',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+            }}
+          >
+            <h2 style={{ marginBottom: 20 }}>正解です！</h2>
+            <button
+              onClick={handleNext}
+              style={{
+                backgroundColor: '#0070f3',
+                color: 'white',
+                padding: '10px 20px',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '16px',
+              }}
+            >
+              次へ →
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
