@@ -1,4 +1,4 @@
-"use client"; // これはクライアント部品です、という宣言
+"use client";
 
 import { useRouter } from "next/navigation";
 import { gameData } from "@/lib/gameData";
@@ -8,6 +8,7 @@ import SuccessScreen from "@/components/game/SuccessScreen";
 import GameOverScreen from "@/components/game/GameOverScreen";
 import { useGame } from "@/app/provider/GameProvider";
 import { useEffect } from "react";
+import DoorScreen from "@/components/game/DoreScreen";
 
 export default function GameClient({ chapterId }: { chapterId: string }) {
   const router = useRouter();
@@ -29,17 +30,6 @@ export default function GameClient({ chapterId }: { chapterId: string }) {
     }
 
     let nextId = chapter.nextChapterId;
-    let nextChapter = gameData[nextId];
-
-    while (
-      nextChapter &&
-      nextChapter.type === "action" &&
-      "nextChapterId" in nextChapter &&
-      nextChapter.nextChapterId
-    ) {
-      nextId = nextChapter.nextChapterId;
-      nextChapter = gameData[nextId];
-    }
 
     if (nextId && gameData[nextId]) {
       setCurrentChapterId(nextId);
@@ -60,6 +50,9 @@ export default function GameClient({ chapterId }: { chapterId: string }) {
       )}
       {chapter.type === "puzzle" && (
         <PuzzleDisplay puzzle={chapter} onSolved={goToNextChapter} />
+      )}
+      {chapter.type === "door" && (
+        <DoorScreen onSolved={goToNextChapter} />
       )}
       {chapter.type === "ending" && chapterId === "success" && (
         <SuccessScreen title={chapter.title} message={chapter.message} />
