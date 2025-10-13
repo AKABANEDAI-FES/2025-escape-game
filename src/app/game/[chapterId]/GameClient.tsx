@@ -30,17 +30,6 @@ export default function GameClient({ chapterId }: { chapterId: string }) {
     }
 
     let nextId = chapter.nextChapterId;
-    let nextChapter = gameData[nextId];
-
-    while (
-      nextChapter &&
-      nextChapter.type === "door" &&
-      "nextChapterId" in nextChapter &&
-      nextChapter.nextChapterId
-    ) {
-      nextId = nextChapter.nextChapterId;
-      nextChapter = gameData[nextId];
-    }
 
     if (nextId && gameData[nextId]) {
       setCurrentChapterId(nextId);

@@ -101,7 +101,7 @@ export const gameData: Record<string, GameChapter> = {
     nextChapterId: "action-door-open",
   },
   "action-door-open": {
-    id: "action1",
+    id: "action-door-open",
     type: "door",
     message: "ドアを開けています...",
     nextChapterId: "puzzle-4-story",
