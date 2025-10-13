@@ -122,7 +122,7 @@ export default function QrReaderClient({
         }) ?? devices[0];
 
       await html5QrCode.start(
-        back.id,
+        { facingMode: { exact: 'environment' } },
         {
           fps: 10,
           qrbox: 250,
