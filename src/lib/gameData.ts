@@ -23,8 +23,7 @@ export interface PuzzleChapter {
 
 export interface ActionChapter {
   id: string; // idを追加
-  type: "action";
-  actionType: "DOOR_OPEN" | "PROJECTOR_CHANGE" | "LIGHTING_CHANGE";
+  type: "door";
   message: string;
   nextChapterId: string;
 }
@@ -103,8 +102,7 @@ export const gameData: Record<string, GameChapter> = {
   },
   "action-door-open": {
     id: "action1",
-    type: "action",
-    actionType: "DOOR_OPEN",
+    type: "door",
     message: "ドアを開けています...",
     nextChapterId: "puzzle-4-story",
   },
@@ -120,7 +118,6 @@ export const gameData: Record<string, GameChapter> = {
     puzzleType: "TEXT_INPUT",
     question: "中央のコンソールに表示された謎を解け。",
     answer: "test", // TEXT_INPUT時の正解はanswerで判定
-    // "noimage"を削除
     nextChapterId: "projector-start-story",
     hint: ["ヒント: 部屋の壁に注目してみろ。", "ヒント２:テキストテキスト"],
   },
@@ -128,13 +125,6 @@ export const gameData: Record<string, GameChapter> = {
     id: "chapter3",
     type: "story",
     content: ["AI: 残す謎はあと一つ...。部屋の様子が変わる。よく観察しろ。"],
-    nextChapterId: "action-projector-lights-on",
-  },
-  "action-projector-lights-on": {
-    id: "action2",
-    type: "action",
-    actionType: "PROJECTOR_CHANGE",
-    message: "システムを最終モードに移行します...",
     nextChapterId: "puzzle-5",
   },
   'puzzle-5': {
