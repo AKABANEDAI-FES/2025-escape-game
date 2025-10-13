@@ -29,7 +29,7 @@ export default function GameClient({ chapterId }: { chapterId: string }) {
       return;
     }
 
-    let nextId = chapter.nextChapterId;
+    const nextId = chapter.nextChapterId;
 
     if (nextId && gameData[nextId]) {
       setCurrentChapterId(nextId);
