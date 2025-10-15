@@ -108,7 +108,7 @@ export default function PuzzleDisplay({
       >
         進捗を見る
       </label>
-      <div className="popup fixed inset-0 hidden peer-checked/progress-flag:block z-50">
+      <div className="popup fixed inset-0 overflow-y-auto hidden peer-checked/progress-flag:block z-50">
         <ProgressPage />
         <label
           className="fixed left-4/6 px-6 py-2 hover:bg-cyan-700 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 border-black border"
