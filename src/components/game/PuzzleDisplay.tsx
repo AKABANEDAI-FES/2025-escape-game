@@ -43,16 +43,41 @@ export default function PuzzleDisplay({
     }
     const startTime = gameState.hintStartTimes[puzzle.id] ?? Date.now();
     const elapsed = Date.now() - startTime;
-    const remaining = 10000 - elapsed;
-    if (remaining <= 0) {
-      const message = isNormal ? puzzle.hint[0] : puzzle.hint.join("\n");
-      setHintMessage(message);
+    // Normal difficulty: Show the first hint after 10 seconds
+    if (isNormal) {
+      const remaining = 10000 - elapsed;
+      if (remaining <= 0) {
+        setHintMessage(puzzle.hint[0]);
+      } else {
+        const timer = setTimeout(() => {
+          setHintMessage(puzzle.hint[0]);
+        }, remaining);
+        return () => clearTimeout(timer);
+      }
     } else {
-      const timer = setTimeout(() => {
-        const message = isNormal ? puzzle.hint[0] : puzzle.hint.join("\n");
-        setHintMessage(message);
-      }, remaining);
-      return () => clearTimeout(timer);
+      // Not normal difficulty: Show hints sequentially
+      const timers: NodeJS.Timeout[] = [];
+      puzzle.hint.forEach((hint, index) => {
+        const delay = (index + 1) * 10000; // 10s, 20s, 30s...
+        const remaining = delay - elapsed;
+        // A function to update the hint message
+        const updateHints = () => {
+          const message = puzzle.hint.slice(0, index + 1).join("\n");
+          setHintMessage(message);
+        };
+        if (remaining <= 0) {
+          // If the time has already passed, update immediately
+          updateHints();
+        } else {
+          // Otherwise, set a timer for the remaining time
+          const timer = setTimeout(updateHints, remaining);
+          timers.push(timer);
+        }
+      });
+      // Cleanup function to clear all scheduled timers
+      return () => {
+        timers.forEach(clearTimeout);
+      };
     }
   }, [puzzle.id, puzzle.hint, isNormal, gameState.hintStartTimes]);
 
